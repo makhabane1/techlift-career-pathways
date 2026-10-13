@@ -1,0 +1,193 @@
+.signup-page {
+  padding-top: 48px;
+}
+
+.signup-shell {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.signup-intro {
+  padding-top: 32px;
+}
+
+.progress-card {
+  margin-top: 28px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(91, 124, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-track span {
+  display: block;
+  width: 33.33%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
+.signup-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: grid;
+  gap: 18px;
+}
+
+.form-step h2 {
+  margin-bottom: 8px;
+}
+
+.signup-panel label {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.signup-panel input,
+.signup-panel select,
+.signup-panel textarea {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  border-radius: 14px;
+  background: rgba(245, 247, 251, 0.9);
+  padding: 14px 16px;
+  font: inherit;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.choice-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(245, 247, 251, 0.8);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.choice-card:hover {
+  transform: translateY(-1px);
+}
+
+.choice-card input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-card.selected {
+  border-color: rgba(91, 124, 255, 0.32);
+  background: rgba(91, 124, 255, 0.08);
+}
+
+.choice-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.choice-top strong {
+  font-size: 1.05rem;
+}
+
+.choice-top em {
+  font-style: normal;
+  color: var(--primary-dark);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.choice-card small {
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.success-message {
+  display: grid;
+  gap: 16px;
+  text-align: left;
+}
+
+.success-message h2 {
+  margin: 0;
+}
+
+.success-message p {
+  color: var(--text-soft);
+}
+
+@media (max-width: 900px) {
+  .signup-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,395 @@
+.dashboard-page {
+  padding-top: 8px;
+}
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.hero-copy {
+  padding-right: 20px;
+}
+
+.dashboard-cta {
+  margin-top: 28px;
+}
+
+.mini-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 26px;
+}
+
+.card-label {
+  margin: 0 0 10px;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.milestone-card h2 {
+  margin-bottom: 18px;
+}
+
+.milestone-progress {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.milestone-progress span {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--primary-dark);
+}
+
+.mini-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(91, 124, 255, 0.12);
+  overflow: hidden;
+}
+
+.mini-bar i {
+  display: block;
+  width: 72%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.milestone-card ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-soft);
+}
+
+.milestone-card li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.milestone-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.stat-kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--text-soft);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.stat-card small {
+  color: var(--text-soft);
+}
+
+.dashboard-grid,
+.insight-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 28px;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 26px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.roadmap-list,
+.agenda-list {
+  display: grid;
+  gap: 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.roadmap-list li,
+.agenda-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.roadmap-list li:last-child,
+.agenda-list li:last-child {
+  border-bottom: 0;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.12);
+}
+
+.roadmap-list li.done .dot {
+  background: var(--success);
+}
+
+.roadmap-list li.active .dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 6px rgba(91, 124, 255, 0.12);
+}
+
+.roadmap-list strong,
+.agenda-list strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.roadmap-list small,
+.agenda-list small,
+.insight-panel p,
+.mentor-panel p {
+  color: var(--text-soft);
+}
+
+.agenda-list li {
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+}
+
+.agenda-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 12px;
+  background: rgba(91, 124, 255, 0.08);
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.insight-panel,
+.mentor-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.proof-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.challenge-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.challenge-heading,
+.challenge-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.challenge-status {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.06);
+  color: var(--text-soft);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.challenge-status.is-submitted {
+  background: rgba(31, 165, 107, 0.12);
+  color: #14794e;
+}
+
+.challenge-status.is-approved {
+  background: rgba(31, 165, 107, 0.12);
+  color: #14794e;
+}
+
+.challenge-status.is-changes-requested {
+  background: rgba(217, 119, 6, 0.12);
+  color: #9a5700;
+}
+
+.challenge-client {
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.challenge-client span {
+  padding: 0 6px;
+  color: var(--primary);
+}
+
+.challenge-brief {
+  max-width: 65ch;
+  color: var(--text-soft);
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tags span {
+  padding: 7px 10px;
+  border: 1px solid rgba(79, 70, 229, 0.12);
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.05);
+  color: var(--primary-dark);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.challenge-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.challenge-form label {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.challenge-form label span {
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.challenge-form textarea,
+.challenge-form input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px 14px;
+  color: var(--text);
+  font: inherit;
+}
+
+.challenge-form textarea {
+  resize: vertical;
+}
+
+.challenge-form textarea:focus,
+.challenge-form input:focus {
+  outline: 3px solid rgba(79, 70, 229, 0.14);
+  border-color: var(--primary);
+}
+
+.challenge-actions {
+  align-items: flex-end;
+  margin-top: 4px;
+}
+
+.submission-feedback {
+  max-width: 42ch;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.mentor-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .dashboard-shell,
+  .dashboard-grid,
+  .insight-grid,
+  .proof-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-cta {
+    display: grid;
+    gap: 12px;
+  }
+
+  .challenge-heading,
+  .challenge-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .challenge-actions .btn {
+    width: 100%;
+  }
+}

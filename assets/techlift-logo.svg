@@ -1,0 +1,26 @@
+<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TechLift logo">
+  <defs>
+    <linearGradient id="techliftBg" x1="32" y1="26" x2="186" y2="194" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.5" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#131C34"/>
+    </linearGradient>
+    <linearGradient id="techliftMark" x1="56" y1="52" x2="166" y2="172" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8DDCFF"/>
+      <stop offset="0.2" stop-color="#5B7CFF"/>
+      <stop offset="0.7" stop-color="#7B61FF"/>
+      <stop offset="1" stop-color="#B775FF"/>
+    </linearGradient>
+    <linearGradient id="techliftBeam" x1="78" y1="82" x2="164" y2="154" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EAF4FF"/>
+      <stop offset="1" stop-color="#C9D9FF"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="18" width="184" height="184" rx="46" fill="url(#techliftBg)"/>
+  <path d="M38 62C66 38 96 28 125 28C155 28 178 42 194 57V136C179 163 151 184 120 184C91 184 60 171 38 150V62Z" fill="url(#techliftBg)" fill-opacity="0.8"/>
+  <path d="M51 58H169C176.732 58 183 64.268 183 72V83C183 90.732 176.732 97 169 97H121V156C121 163.732 114.732 170 107 170H93C85.268 170 79 163.732 79 156V97H51C43.268 97 37 90.732 37 83V72C37 64.268 43.268 58 51 58Z" fill="url(#techliftMark)"/>
+  <path d="M72 74H148C155.732 74 162 80.268 162 88V92C162 99.732 155.732 106 148 106H122V150C122 157.732 115.732 164 108 164H92C84.268 164 78 157.732 78 150V106H72C64.268 106 58 99.732 58 92V88C58 80.268 64.268 74 72 74Z" fill="url(#techliftBeam)" fill-opacity="0.92"/>
+  <path d="M138 76.5C150 76.5 160 83.5 166 94.5L172 106H143.5L133.5 87.5C130.6 82.5 134.3 76.5 138 76.5Z" fill="#F9FBFF" fill-opacity="0.76"/>
+  <path d="M65 62H155" stroke="#D9E8FF" stroke-opacity="0.26" stroke-width="3" stroke-linecap="round"/>
+</svg>

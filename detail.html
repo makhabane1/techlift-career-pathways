@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frontend Foundations | TechLift</title>
+    <meta
+      name="description"
+      content="Explore the Frontend Foundations course, learn core skills, and map your path to a development career."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/detail.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="index.html" aria-label="TechLift home">
+          <img
+            class="brand-logo"
+            src="assets/techlift-logo.svg"
+            alt="TechLift logo"
+          />
+          <span>TechLift</span>
+        </a>
+
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="programs.html">Programs</a>
+          <a href="index.html#career-map">Career map</a>
+          <a href="index.html#success">Success stories</a>
+          <a href="index.html#instructors">Instructors</a>
+        </nav>
+
+        <div class="nav-actions">
+          <a class="text-link" href="#">Sign in</a>
+          <a class="btn btn-primary" href="#">Get started</a>
+        </div>
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          aria-pressed="false"
+          title="Switch to dark mode"
+        >
+          <span aria-hidden="true">☾</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="detail-hero section">
+        <div class="container detail-layout">
+          <div class="detail-copy">
+            <p class="eyebrow">Frontend track</p>
+            <h1>Frontend Foundations</h1>
+            <p class="lede">
+              Learn how to structure pages, style them beautifully, and add the
+              interactivity that turns static layouts into real user
+              experiences.
+            </p>
+
+            <div class="meta-row">
+              <span>Beginner</span>
+              <span>8 weeks</span>
+              <span>Mentor support</span>
+            </div>
+
+            <div class="cta-row-detail">
+              <a class="btn btn-primary" href="signup.html">Apply now</a>
+              <a class="btn btn-secondary" href="programs.html"
+                >Back to programs</a
+              >
+            </div>
+          </div>
+
+          <aside class="summary-card">
+            <h3>Course snapshot</h3>
+            <ul>
+              <li><strong>Projects:</strong> 4 portfolio builds</li>
+              <li><strong>Format:</strong> Weekly live sessions</li>
+              <li><strong>Skills:</strong> HTML, CSS, JS</li>
+              <li><strong>Outcome:</strong> Job-ready frontend basics</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section section-alt">
+        <div class="container detail-grid">
+          <div class="module-panel">
+            <p class="eyebrow">What you’ll learn</p>
+            <h2>Build practical frontend skills from day one.</h2>
+
+            <div class="module-list">
+              <article class="module-item">
+                <span class="module-number">01</span>
+                <div>
+                  <h3>HTML structure</h3>
+                  <p>
+                    Build semantic, accessible page layouts and understand the
+                    foundations of the web.
+                  </p>
+                </div>
+              </article>
+
+              <article class="module-item">
+                <span class="module-number">02</span>
+                <div>
+                  <h3>CSS design systems</h3>
+                  <p>
+                    Style interfaces with spacing, hierarchy, color, and
+                    responsive layout patterns.
+                  </p>
+                </div>
+              </article>
+
+              <article class="module-item">
+                <span class="module-number">03</span>
+                <div>
+                  <h3>JavaScript basics</h3>
+                  <p>
+                    Handle interactivity, DOM updates, data flow, and simple
+                    user logic with confidence.
+                  </p>
+                </div>
+              </article>
+
+              <article class="module-item">
+                <span class="module-number">04</span>
+                <div>
+                  <h3>Portfolio projects</h3>
+                  <p>
+                    Apply your progress to real-world mini projects that sharpen
+                    your portfolio story.
+                  </p>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <aside class="side-panel" id="apply">
+            <p class="eyebrow">Apply today</p>
+            <h3>Secure your spot in this next cohort.</h3>
+
+            <form class="apply-form">
+              <label>
+                Full name
+                <input type="text" placeholder="Your name" />
+              </label>
+
+              <label>
+                Email address
+                <input type="email" placeholder="you@example.com" />
+              </label>
+
+              <label>
+                Career goal
+                <select>
+                  <option>Frontend developer</option>
+                  <option>Product designer</option>
+                  <option>UX researcher</option>
+                  <option>Web developer</option>
+                </select>
+              </label>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+                formaction="signup.html"
+              >
+                Join cohort
+              </button>
+            </form>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-shell">
+        <div>
+          <a class="brand footer-brand" href="index.html">
+            <span class="brand-mark">T</span>
+            <span>TechLift</span>
+          </a>
+        </div>
+
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="programs.html">Programs</a>
+          <a href="index.html#career-map">Career map</a>
+          <a href="index.html#success">Stories</a>
+          <a href="index.html#instructors">Mentors</a>
+        </nav>
+
+        <a class="text-link" href="#">Hire graduates</a>
+      </div>
+    </footer>
+    <script src="js/theme.js"></script>
+  </body>
+</html>

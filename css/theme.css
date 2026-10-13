@@ -1,0 +1,151 @@
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #10131b;
+  --bg-strong: #191d2a;
+  --surface: #1a1f2b;
+  --surface-alt: #171b25;
+  --surface-soft: #22283a;
+  --text: #f3f4f6;
+  --text-soft: #b1bac9;
+  --line: rgba(226, 232, 240, 0.12);
+  --primary: #9da9ff;
+  --primary-dark: #c4caff;
+  --primary-soft: rgba(129, 140, 248, 0.18);
+  --accent: #b59aff;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] body {
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(99, 102, 241, 0.1),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #141821 0%, var(--bg) 100%);
+}
+
+[data-theme="dark"] .site-header {
+  background: rgba(16, 19, 27, 0.88);
+  border-bottom-color: var(--line);
+}
+
+[data-theme="dark"] .section-alt,
+[data-theme="dark"] .mentor-work-section,
+[data-theme="dark"] .mentor-profile-section {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .course-card,
+[data-theme="dark"] .story-card,
+[data-theme="dark"] .mentor-card,
+[data-theme="dark"] .map-panel,
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .module-panel,
+[data-theme="dark"] .side-panel,
+[data-theme="dark"] .progress-card,
+[data-theme="dark"] .signup-panel,
+[data-theme="dark"] .auth-panel,
+[data-theme="dark"] .mini-panel,
+[data-theme="dark"] .mini-card,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .panel-stats div,
+[data-theme="dark"] .module-item,
+[data-theme="dark"] .choice-card,
+[data-theme="dark"] .career-map,
+[data-theme="dark"] .submission-card,
+[data-theme="dark"] .empty-queue {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .hero-panel,
+[data-theme="dark"] .card-highlight {
+  background: linear-gradient(145deg, #232943, #1a1f2b 72%);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .career-map {
+  background: linear-gradient(180deg, #1c2230, #171b25);
+}
+
+[data-theme="dark"] .career-map-paths .path-button,
+[data-theme="dark"] .filter-btn {
+  background: var(--surface-alt);
+  color: var(--text-soft);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .path-button.active,
+[data-theme="dark"] .filter-btn.active,
+[data-theme="dark"] .choice-card.selected {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  border-color: rgba(157, 169, 255, 0.4);
+}
+
+[data-theme="dark"] input:not([type="checkbox"]),
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #111620;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #8993a5;
+}
+
+[data-theme="dark"] .theme-toggle {
+  color: #f7d987;
+  background: #202536;
+  border-color: var(--line);
+}
+
+[data-theme="dark"] .career-map-node text {
+  fill: var(--text);
+}
+
+[data-theme="dark"] .footer-shell,
+[data-theme="dark"] .course-card .card-footer {
+  border-color: var(--line);
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid rgba(79, 70, 229, 0.35);
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .theme-toggle {
+    margin-left: auto;
+  }
+}

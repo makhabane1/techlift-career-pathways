@@ -1,0 +1,75 @@
+.career-map {
+  position: relative;
+  min-height: 540px;
+  background: linear-gradient(
+    180deg,
+    rgba(91, 124, 255, 0.04),
+    rgba(255, 255, 255, 0.75)
+  );
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.career-map-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  display: block;
+}
+
+.career-map-paths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px 18px 0;
+}
+
+.path-button {
+  border: 1px solid rgba(91, 124, 255, 0.12);
+  background: white;
+  color: var(--text-soft);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.path-button.active {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  border-color: rgba(91, 124, 255, 0.18);
+}
+
+.career-map-node {
+  cursor: pointer;
+}
+
+.career-map-node circle {
+  transition:
+    stroke 0.2s ease,
+    fill 0.2s ease,
+    transform 0.2s ease;
+}
+
+.career-map-node text {
+  font-size: 11px;
+  font-weight: 700;
+  fill: #1f2937;
+}
+
+.career-map-node.is-current circle {
+  stroke: var(--primary-dark);
+  stroke-width: 4;
+}
+
+.career-map-node.is-complete circle {
+  fill: rgba(35, 178, 109, 0.12);
+  stroke: rgba(35, 178, 109, 0.2);
+}
+
+.career-map-node.is-upcoming circle {
+  fill: rgba(15, 23, 42, 0.04);
+  stroke: rgba(15, 23, 42, 0.1);
+}
