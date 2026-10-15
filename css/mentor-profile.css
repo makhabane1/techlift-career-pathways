@@ -132,7 +132,7 @@
 
 .profile-fields input:focus,
 .profile-fields textarea:focus {
-  outline: 3px solid rgba(79, 70, 229, 0.14);
+  outline: 3px solid rgba(29, 78, 216, 0.14);
   border-color: var(--primary);
 }
 
@@ -233,7 +233,7 @@
 
 .mentor-expertise-item {
   padding: 5px 9px;
-  border: 1px solid rgba(79, 70, 229, 0.12);
+  border: 1px solid rgba(29, 78, 216, 0.12);
   border-radius: 999px;
   background: var(--primary-soft);
   color: var(--primary-dark);

@@ -127,12 +127,12 @@
 
 .review-state.approved {
   background: rgba(31, 165, 107, 0.12);
-  color: #14794e;
+  color: var(--success-text);
 }
 
 .review-state.changes {
   background: rgba(217, 119, 6, 0.12);
-  color: #9a5700;
+  color: var(--warning-text);
 }
 
 .submission-student {
@@ -182,7 +182,7 @@
 }
 
 .submission-review textarea:focus {
-  outline: 3px solid rgba(79, 70, 229, 0.14);
+  outline: 3px solid rgba(29, 78, 216, 0.14);
   border-color: var(--primary);
 }
 
@@ -236,7 +236,7 @@
   height: 48px;
   border-radius: 50%;
   background: rgba(31, 165, 107, 0.12);
-  color: #14794e;
+  color: var(--success-text);
   font-size: 1.25rem;
   font-weight: 800;
 }

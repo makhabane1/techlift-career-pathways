@@ -9,13 +9,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(124, 58, 237, 0.06),
-      transparent 28%
-    ),
-    linear-gradient(180deg, #f9faff 0%, var(--bg) 100%);
+  background: var(--bg);
   color: var(--text);
   line-height: 1.6;
 }
@@ -113,4 +107,79 @@ h3 {
   .section {
     padding: 72px 0;
   }
+}
+
+/* Headings use the editorial serif; body text stays in the sans-serif */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+/* Header navigation: keep each link on one line, and let the row tighten on narrower screens */
+.main-nav a,
+.nav-actions a {
+  white-space: nowrap;
+}
+
+@media (min-width: 901px) {
+  .main-nav {
+    gap: 14px;
+    font-size: 0.9rem;
+  }
+
+  .nav-actions {
+    gap: 10px;
+  }
+}
+
+/* Tools menu in the header: a native disclosure, so it works without JavaScript */
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu summary {
+  cursor: pointer;
+  list-style: none;
+  font: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+.nav-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-menu summary::after {
+  content: " ▾";
+  font-size: 0.8em;
+}
+
+.nav-menu-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  gap: 10px;
+  min-width: 210px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.nav-menu-panel a {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Ordered lists used as card rows should not show list markers */
+ol.story-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }

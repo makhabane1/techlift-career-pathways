@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
+TechLiftStore.ready.then(() => {
   const form = document.getElementById("loginForm");
 
   if (!form) return;
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const email = document.getElementById("loginEmail");
@@ -21,18 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!valid) return;
 
-    const existingUser = JSON.parse(
-      localStorage.getItem("techliftUser") || "null",
-    ) || {
-      fullName: "Maya Patel",
-      path: "frontend",
-      goal: "Switch careers",
-      availability: "10 hours/week",
-    };
-
-    existingUser.email = email.value.trim();
-    localStorage.setItem("techliftUser", JSON.stringify(existingUser));
-
-    window.location.href = "dashboard.html";
+    try {
+      const account = await TechLiftStore.login(email.value.trim(), password.value);
+      window.location.href = account.role === "mentor" ? "mentor-dashboard.html" : "dashboard.html";
+    } catch (error) {
+      alert(error.message);
+    }
   });
 });

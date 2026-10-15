@@ -1,0 +1,689 @@
+/* Styles for the feature panels: revisions, peer review, mentor matching,
+   calibration, spot-checks, and the skills passport. */
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--text-soft);
+}
+
+.features-section,
+.mentor-insights-section {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.feature-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 26px;
+  min-width: 0;
+}
+
+.feature-panel h2 {
+  font-size: 1.4rem;
+}
+
+.feature-wide {
+  grid-column: 1 / -1;
+}
+
+.feature-panel .btn {
+  justify-self: start;
+}
+
+/* Shared small components */
+
+.review-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.06);
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.review-state.approved {
+  background: rgba(31, 165, 107, 0.12);
+  color: var(--success-text);
+}
+
+.review-state.changes {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--warning-text);
+}
+
+.round-badge,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.skill-chips,
+.skill-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.skill-chip.verified {
+  border-color: rgba(31, 165, 107, 0.35);
+  background: rgba(31, 165, 107, 0.1);
+  color: var(--success);
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stat-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.stat-list div {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-alt);
+}
+
+.stat-list dt {
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stat-list dd {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-link {
+  width: fit-content;
+  color: var(--primary-dark);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.submission-student {
+  color: var(--text-soft);
+  font-size: 0.86rem;
+}
+
+.submission-description {
+  color: var(--text-soft);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Rubric scoring (used by mentors and peers) */
+
+.rubric {
+  display: grid;
+  gap: 10px;
+}
+
+.rubric-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-alt);
+}
+
+.rubric-skill {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.rubric-before {
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.rubric-row select,
+.rubric-row input,
+.peer-form select,
+.peer-form textarea,
+.peer-comment-field textarea,
+.spot-check-form input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-weight: 500;
+}
+
+.rubric-row input,
+.spot-check-form input {
+  font-size: 0.88rem;
+}
+
+.spot-check-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+/* Revisions */
+
+.round-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.round-item {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-alt);
+}
+
+.round-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.round-head small {
+  color: var(--text-soft);
+}
+
+.round-change span,
+.round-context .eyebrow {
+  font-weight: 800;
+}
+
+.round-excerpt,
+.round-feedback,
+.round-change,
+.round-context p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.round-excerpt {
+  color: var(--text-soft);
+}
+
+.round-context {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-left: 3px solid var(--primary);
+  background: var(--surface-soft);
+  border-radius: 10px;
+}
+
+.round-context .eyebrow {
+  margin: 0;
+}
+
+/* Peer review */
+
+.peer-card,
+.peer-review-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-alt);
+  min-width: 0;
+}
+
+.peer-form {
+  display: grid;
+  gap: 10px;
+}
+
+.peer-form .btn,
+.spot-check-form .btn {
+  justify-self: start;
+}
+
+.peer-comment-field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.peer-scores {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.peer-scores li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  font-size: 0.88rem;
+}
+
+.peer-scores small {
+  grid-column: 1 / -1;
+  color: var(--text-soft);
+}
+
+.peer-comment {
+  margin: 0;
+  color: var(--text-soft);
+  font-style: italic;
+}
+
+.spot-check {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.spot-check.agree {
+  background: rgba(31, 165, 107, 0.1);
+  color: var(--success-text);
+}
+
+.spot-check.disagree {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--warning-text);
+}
+
+/* Mentor matching */
+
+.match-list {
+  display: grid;
+  gap: 12px;
+}
+
+.match-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-alt);
+}
+
+.match-card.is-selected {
+  border-color: rgba(31, 165, 107, 0.45);
+  background: rgba(31, 165, 107, 0.06);
+}
+
+.match-card .btn {
+  justify-self: start;
+}
+
+.match-reason {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+/* Calibration */
+
+.calibration-row {
+  display: grid;
+  gap: 10px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.calibration-row h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.calibration-row h4 small {
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.calibration-row ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.calibration-item {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+  font-size: 0.88rem;
+}
+
+.calibration-item .flag {
+  font-weight: 800;
+}
+
+.calibration-item.aligned .flag {
+  color: var(--success-text);
+}
+
+.calibration-item.gap .flag {
+  color: var(--primary-dark);
+}
+
+.calibration-item.outlier {
+  background: rgba(217, 119, 6, 0.1);
+}
+
+.calibration-item.outlier .flag {
+  color: var(--warning-text);
+}
+
+/* Passport */
+
+.passport-page {
+  min-height: 70vh;
+}
+
+.passport-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.passport-toolbar h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.passport-card {
+  display: grid;
+  gap: 26px;
+  padding: 32px;
+}
+
+.passport-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.passport-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.8rem;
+}
+
+.passport-header .stat-list {
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+}
+
+.passport-skills {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.passport-skill {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-alt);
+}
+
+.passport-skill-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 1.05rem;
+}
+
+.passport-evidence {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0 0 0 16px;
+  border-left: 2px solid var(--primary-soft);
+  list-style: none;
+}
+
+.passport-evidence li {
+  display: grid;
+  gap: 2px;
+}
+
+.passport-evidence small {
+  color: var(--text-soft);
+}
+
+.empty-passport {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 32px 0;
+}
+
+.passport-note {
+  margin-top: 18px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calibration-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .feature-panel,
+  .passport-card {
+    padding: 20px;
+  }
+}
+
+/* Dark-mode contrast fixes for mentor workspace controls. These load after
+   mentor-dashboard.css, so they override its fixed light backgrounds. */
+
+.review-summary {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.review-summary small {
+  color: var(--text-soft);
+}
+
+.review-actions .btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* Print: only the passport card */
+
+@media print {
+  .site-header,
+  .site-footer,
+  .no-print,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .passport-card {
+    box-shadow: none;
+    border: 0;
+  }
+
+  .passport-skill,
+  .round-item {
+    break-inside: avoid;
+  }
+}
+
+/* Rubric anchors: what the chosen score means for this skill */
+.rubric-anchor {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Notifications */
+.notice-section {
+  padding-top: 24px;
+  padding-bottom: 0;
+}
+
+.notice-bar {
+  display: grid;
+  gap: 10px;
+  padding: 16px 20px;
+  border: 1px solid rgba(29, 78, 216, 0.25);
+  border-left: 4px solid var(--primary);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.notice-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notice-head .text-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.notice-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notice-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notice-list a {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.notice-list small {
+  color: var(--text-soft);
+}
+
+/* A button that looks like a text link (used for log out) */
+.button-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.button-link:focus-visible {
+  outline: 3px solid var(--primary-soft);
+  outline-offset: 3px;
+}

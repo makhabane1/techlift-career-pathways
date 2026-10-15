@@ -1,28 +1,30 @@
+/* Status text colours, readable on light and dark surfaces. */
+:root {
+  --success-text: #14794e;
+  --warning-text: #9a5700;
+}
+
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #10131b;
-  --bg-strong: #191d2a;
-  --surface: #1a1f2b;
-  --surface-alt: #171b25;
-  --surface-soft: #22283a;
-  --text: #f3f4f6;
-  --text-soft: #b1bac9;
+  --success-text: #6ee7b7;
+  --warning-text: #fbbf24;
+  --bg: #121419;
+  --bg-strong: #1a1d25;
+  --surface: #1a1d25;
+  --surface-alt: #161922;
+  --surface-soft: #232734;
+  --text: #f3efe6;
+  --text-soft: #aab0bd;
   --line: rgba(226, 232, 240, 0.12);
-  --primary: #9da9ff;
-  --primary-dark: #c4caff;
-  --primary-soft: rgba(129, 140, 248, 0.18);
-  --accent: #b59aff;
+  --primary: #8fb0ff;
+  --primary-dark: #cfdcff;
+  --primary-soft: rgba(143, 176, 255, 0.16);
+  --accent: #c7ef5a;
   --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
 }
 
 [data-theme="dark"] body {
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(99, 102, 241, 0.1),
-      transparent 30%
-    ),
-    linear-gradient(180deg, #141821 0%, var(--bg) 100%);
+  background: var(--bg);
 }
 
 [data-theme="dark"] .site-header {
@@ -140,7 +142,7 @@
 }
 
 .theme-toggle:focus-visible {
-  outline: 3px solid rgba(79, 70, 229, 0.35);
+  outline: 3px solid rgba(29, 78, 216, 0.35);
   outline-offset: 2px;
 }
 
@@ -148,4 +150,12 @@
   .theme-toggle {
     margin-left: auto;
   }
+}
+
+/* Dark mode: white text on the primary colour needs a deeper blue to stay readable */
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] button[type="submit"],
+[data-theme="dark"] .module-number {
+  background: #3b5bdb;
+  color: #ffffff;
 }

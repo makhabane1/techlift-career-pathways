@@ -13,12 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.querySelectorAll("[data-wire]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-    });
-  });
-
   const mapTitle = document.getElementById("mapTitle");
   const mapSummary = document.getElementById("mapSummary");
   const mapMilestones = document.getElementById("mapMilestones");

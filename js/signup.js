@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+TechLiftStore.ready.then(() => {
   const form = document.getElementById("signupForm");
   const steps = Array.from(document.querySelectorAll(".form-step"));
   const nextBtn = document.getElementById("nextBtn");
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const requiredInputs = form.querySelectorAll(
@@ -93,9 +93,21 @@ document.addEventListener("DOMContentLoaded", () => {
       availability: document.getElementById("availability").value,
     };
 
-    localStorage.setItem("techliftUser", JSON.stringify(userData));
+    const password = document.getElementById("password").value;
+    if (password.length < 8) {
+      alert("Use a password of at least 8 characters.");
+      return;
+    }
+
+    try {
+      await TechLiftStore.signup({ ...userData, name: userData.fullName, password, role: "learner" });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     form.classList.add("hidden");
     successMessage.classList.remove("hidden");
+    window.location.href = "dashboard.html";
   });
 
   updateStepUI();

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechLift | Skills passport</title>
+    <meta
+      name="description"
+      content="Your TechLift skills passport: skills verified by mentor review, with the evidence behind each one."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/features.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="index.html" aria-label="TechLift home">
+          <img
+            class="brand-logo"
+            src="assets/techlift-logo.svg"
+            alt="TechLift logo"
+          />
+          <span>TechLift</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="passport.html" aria-current="page">Passport</a>
+          <a href="programs.html">Programs</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="btn btn-primary" href="dashboard.html">Back to dashboard</a>
+          <button class="text-link button-link" type="button" data-logout>Log out</button>
+        </div>
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          aria-pressed="false"
+          title="Switch to dark mode"
+        >
+          <span aria-hidden="true">☾</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="section passport-page">
+      <div class="container">
+        <div class="passport-toolbar no-print">
+          <div>
+            <p class="eyebrow">Skills passport</p>
+            <h1>Verified skills</h1>
+            <p class="lede">
+              A skill appears here when a mentor scores it 3 or higher on an
+              approved submission. Each entry links back to the work it came from.
+            </p>
+          </div>
+          <button class="btn btn-primary" type="button" id="printPassport">
+            Print or save as PDF
+          </button>
+        </div>
+
+        <article class="panel passport-card" id="passportCard" aria-live="polite"></article>
+
+        <p class="passport-note no-print">
+          This passport lives in this browser only. A public, shareable link
+          needs the backend described in the README.
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-shell">
+        <a class="brand footer-brand" href="index.html">
+          <span>TechLift</span>
+        </a>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="programs.html">Programs</a>
+          <a href="dashboard.html">Learner dashboard</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="js/challenge-library.js"></script>
+    <script src="js/techlift-store.js"></script>
+    <script src="js/passport.js"></script>
+    <script src="js/theme.js"></script>
+  </body>
+</html>
