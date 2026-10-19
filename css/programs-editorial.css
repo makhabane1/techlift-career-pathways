@@ -1,0 +1,133 @@
+/* Programs page: an editorial list of courses instead of a grid of cards.
+   Loaded after programs.css, so these rules take precedence. */
+
+main .programs-hero .hero-layout {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 980px;
+}
+
+main .programs-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.6vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  max-width: 16ch;
+}
+
+main .filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+main .filter-btn {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0.5rem 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-soft);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  box-shadow: none;
+}
+
+main .filter-btn.active,
+main .filter-btn:hover {
+  color: var(--text);
+  border-bottom-color: var(--primary);
+}
+
+main .filter-btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+main .course-grid {
+  display: block;
+  margin-top: 0;
+}
+
+main .course-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 0.5rem 2.5rem;
+  padding: 2rem 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+main .course-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+main .course-card > * {
+  margin: 0;
+}
+
+main .course-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  grid-column: 1;
+}
+
+main .course-card > p {
+  grid-column: 2;
+  color: var(--text-soft);
+}
+
+main .course-card ul {
+  grid-column: 2;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+}
+
+main .course-card ul li {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+main .course-card > a,
+main .course-card > .text-link {
+  grid-column: 2;
+  justify-self: start;
+  font-weight: 600;
+}
+
+main .course-card > :first-child:not(h3) {
+  grid-column: 1;
+  align-self: start;
+}
+
+@media (max-width: 760px) {
+  main .course-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main .course-card > * {
+    grid-column: 1 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main .course-card,
+  main .filter-btn {
+    transition: none;
+  }
+}
+
+main .filter-btn.active {
+  background: none;
+}
