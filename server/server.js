@@ -106,6 +106,7 @@ const emptyData = () => ({
   submissions: {},
   peerReviews: [],
   notifications: {},
+  community: emptyCommunity(),
 });
 
 const loadData = (file) => {
@@ -962,6 +963,194 @@ const routeKvWrite = (data, account, key, value) => {
   fail(403, "You can only change your own work");
 };
 
+// ---- Build With Me: study groups, partner listings, feedback requests ----
+// Only signed-in accounts see community posts. Blocking hides posts in both
+// directions. Anyone can report a post, and a post reported by
+// REPORTS_TO_HIDE different accounts is hidden from everyone until it is
+// reviewed. Reports are stored in the data file for a moderator to act on.
+const COMMUNITY_KINDS = ["groups", "listings", "requests"];
+const COMMUNITY_LIMIT = 200;
+const COMMUNITY_BLOCK_LIMIT = 200;
+const REPORTS_TO_HIDE = 3;
+const REPORT_REASON_LIMIT = 300;
+// Moderators are named in TECHLIFT_MODERATORS (comma-separated emails).
+// Nobody is a moderator unless their email is listed there.
+const MODERATOR_EMAILS = (process.env.TECHLIFT_MODERATORS || "")
+  .split(",")
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
+
+function emptyCommunity() {
+  return { groups: [], listings: [], requests: [], reports: [], blocks: {} };
+}
+
+const cleanTrack = (value) => {
+  if (!TRACKS.includes(value)) fail(400, "Choose a track");
+  return value;
+};
+
+const saveCommunityItem = (data, account, kind, value) => {
+  const list = data.community[kind];
+  if (list.length >= COMMUNITY_LIMIT)
+    fail(400, "This space is full for now. Try again later.");
+  const title = text(value.title ?? "", 120, "Title");
+  if (!title) fail(400, "Title is required");
+  const item = {
+    id: crypto.randomBytes(8).toString("hex"),
+    ownerId: account.id,
+    ownerName: account.name,
+    track: cleanTrack(value.track),
+    title,
+    summary: text(value.summary ?? "", 600, "Summary"),
+    createdAt: new Date().toISOString(),
+  };
+  if (kind === "groups") item.memberIds = [account.id];
+  if (kind === "listings") {
+    item.skills = text(value.skills ?? "", 200, "Skills");
+    item.availability = text(value.availability ?? "", 200, "Availability");
+  }
+  if (kind === "requests") item.link = cleanWebLink(value.link ?? "", "Link");
+  list.push(item);
+  return item;
+};
+
+const findCommunityItem = (data, kind, id) => {
+  if (!COMMUNITY_KINDS.includes(kind)) fail(404, "Not found");
+  const item = data.community[kind].find((entry) => entry.id === id);
+  if (!item) fail(404, "That post no longer exists");
+  return item;
+};
+
+const setGroupMembership = (data, account, id, joined) => {
+  const group = findCommunityItem(data, "groups", id);
+  const isMember = group.memberIds.includes(account.id);
+  if (joined && !isMember) group.memberIds.push(account.id);
+  if (!joined && isMember) {
+    if (group.ownerId === account.id)
+      fail(400, "The creator cannot leave their own group");
+    group.memberIds = group.memberIds.filter((memberId) => memberId !== account.id);
+  }
+};
+
+const deleteCommunityItem = (data, account, kind, id) => {
+  const item = findCommunityItem(data, kind, id);
+  if (item.ownerId !== account.id)
+    fail(403, "You can only remove your own posts");
+  data.community[kind] = data.community[kind].filter((entry) => entry !== item);
+  data.community.reports = data.community.reports.filter(
+    (report) => report.targetId !== id,
+  );
+};
+
+const reportCommunityItem = (data, account, kind, id, reason) => {
+  const item = findCommunityItem(data, kind, id);
+  if (item.ownerId === account.id) fail(400, "You cannot report your own post");
+  const note = text(reason ?? "", REPORT_REASON_LIMIT, "Reason");
+  if (!note) fail(400, "Tell us why you are reporting this");
+  const alreadyReported = data.community.reports.some(
+    (report) => report.targetId === id && report.reporterId === account.id,
+  );
+  if (!alreadyReported) {
+    data.community.reports.push({
+      id: crypto.randomBytes(8).toString("hex"),
+      targetKind: kind,
+      targetId: id,
+      reporterId: account.id,
+      reason: note,
+      createdAt: new Date().toISOString(),
+    });
+  }
+};
+
+const setBlock = (data, account, targetId, blocked) => {
+  if (targetId === account.id) fail(400, "You cannot block yourself");
+  const current = data.community.blocks[account.id] || [];
+  const others = current.filter((id) => id !== targetId);
+  if (!blocked) {
+    data.community.blocks[account.id] = others;
+    return;
+  }
+  if (!data.accounts.some((item) => item.id === targetId))
+    fail(404, "Account not found");
+  if (others.length >= COMMUNITY_BLOCK_LIMIT)
+    fail(400, "Your block list is full");
+  data.community.blocks[account.id] = [...others, targetId];
+};
+
+const communityHidden = (data, viewerId, item) => {
+  if (item.ownerId === viewerId) return false;
+  const blocks = data.community.blocks;
+  if ((blocks[viewerId] || []).includes(item.ownerId)) return true;
+  if ((blocks[item.ownerId] || []).includes(viewerId)) return true;
+  const reporters = data.community.reports
+    .filter((report) => report.targetId === item.id)
+    .map((report) => report.reporterId);
+  return (
+    reporters.includes(viewerId) || new Set(reporters).size >= REPORTS_TO_HIDE
+  );
+};
+
+// Member account ids stay private; the owner id is shown so members can block an author.
+const communityCard = (kind, item, viewerId) => {
+  const { memberIds = [], ...rest } = item;
+  const card = { ...rest, kind, mine: item.ownerId === viewerId };
+  if (kind === "groups") {
+    card.memberCount = memberIds.length;
+    card.joined = memberIds.includes(viewerId);
+  }
+  return card;
+};
+
+const removeCommunityItem = (data, kind, id) => {
+  const item = findCommunityItem(data, kind, id);
+  data.community[kind] = data.community[kind].filter((entry) => entry !== item);
+  data.community.reports = data.community.reports.filter(
+    (report) => report.targetId !== id,
+  );
+};
+
+// One entry per reported post, for a moderator to review.
+const moderationQueue = (data) => {
+  const byTarget = new Map();
+  data.community.reports.forEach((report) => {
+    const entry = byTarget.get(report.targetId) || {
+      report,
+      reasons: [],
+      reporters: new Set(),
+    };
+    entry.reasons.push(report.reason);
+    entry.reporters.add(report.reporterId);
+    byTarget.set(report.targetId, entry);
+  });
+  return [...byTarget.entries()].map(([targetId, entry]) => {
+    const kind = entry.report.targetKind;
+    const post = (data.community[kind] || []).find((item) => item.id === targetId);
+    return {
+      targetKind: kind,
+      targetId,
+      title: post ? post.title : "(post already removed)",
+      ownerName: post ? post.ownerName : "",
+      reportCount: entry.reporters.size,
+      hiddenFromMembers: entry.reporters.size >= REPORTS_TO_HIDE,
+      reasons: entry.reasons,
+    };
+  });
+};
+
+const communityView = (data, account) => {
+  const blocked = (data.community.blocks[account.id] || [])
+    .map((id) => data.accounts.find((item) => item.id === id))
+    .filter(Boolean)
+    .map((item) => ({ id: item.id, name: item.name }));
+  const view = { blocked };
+  COMMUNITY_KINDS.forEach((kind) => {
+    view[kind] = data.community[kind]
+      .filter((item) => !communityHidden(data, account.id, item))
+      .map((item) => communityCard(kind, item, account.id));
+  });
+  return view;
+};
+
 // ---- HTTP --------------------------------------------------------------
 
 const readJson = (request) =>
@@ -1027,7 +1216,7 @@ const serveStatic = (request, response, pathname) => {
   });
 };
 
-const createServer = ({ file = DATA_FILE } = {}) => {
+const createServer = ({ file = DATA_FILE, moderators = MODERATOR_EMAILS } = {}) => {
   const data = loadData(file);
   const persist = createPersister(file);
   const sessions = new Map();
@@ -1177,6 +1366,85 @@ const createServer = ({ file = DATA_FILE } = {}) => {
         return sendJson(response, 200, portfolio, {
           "Cache-Control": "no-store",
         });
+      }
+
+      if (pathname === "/api/community" && request.method === "GET") {
+        const account = requireAccount(request);
+        return sendJson(response, 200, communityView(data, account), {
+          "Cache-Control": "no-store",
+        });
+      }
+
+      if (pathname.startsWith("/api/community/")) {
+        const account = requireAccount(request);
+        const [kind, id, action] = pathname
+          .slice("/api/community/".length)
+          .split("/")
+          .map(decodeURIComponent);
+        const method = request.method;
+
+        if (kind === "moderation") {
+          if (!moderators.includes(account.email))
+            fail(403, "Only moderators can review reports");
+          if (method === "GET" && !id) {
+            return sendJson(response, 200, moderationQueue(data), {
+              "Cache-Control": "no-store",
+            });
+          }
+          if (method === "POST" && id && (action === "dismiss" || action === "remove")) {
+            const report = data.community.reports.find((entry) => entry.targetId === id);
+            if (!report) fail(404, "No open reports for that post");
+            if (action === "remove") {
+              removeCommunityItem(data, report.targetKind, id);
+            } else {
+              data.community.reports = data.community.reports.filter(
+                (entry) => entry.targetId !== id,
+              );
+            }
+            await persist(data);
+            response.writeHead(204).end();
+            return;
+          }
+          return sendJson(response, 404, { error: "Unknown endpoint" });
+        }
+
+        if (kind === "blocks" && id && (method === "PUT" || method === "DELETE")) {
+          setBlock(data, account, id, method === "PUT");
+          await persist(data);
+          response.writeHead(204).end();
+          return;
+        }
+        if (method === "DELETE" && COMMUNITY_KINDS.includes(kind) && id && !action) {
+          deleteCommunityItem(data, account, kind, id);
+          await persist(data);
+          response.writeHead(204).end();
+          return;
+        }
+        if (method !== "POST") return sendJson(response, 405, { error: "Method not allowed" });
+
+        const body = await readJson(request);
+        if (!body || typeof body !== "object") fail(400, "Body is required");
+        if (COMMUNITY_KINDS.includes(kind) && !id) {
+          const item = saveCommunityItem(data, account, kind, body);
+          await persist(data);
+          return sendJson(response, 201, communityCard(kind, item, account.id));
+        }
+        if (kind === "groups" && id && action === "membership") {
+          if (typeof body.joined !== "boolean") fail(400, "Say whether you are joining");
+          setGroupMembership(data, account, id, body.joined);
+          await persist(data);
+          return sendJson(
+            response,
+            200,
+            communityCard("groups", findCommunityItem(data, "groups", id), account.id),
+          );
+        }
+        if (COMMUNITY_KINDS.includes(kind) && id && action === "report") {
+          reportCommunityItem(data, account, kind, id, body.reason);
+          await persist(data);
+          return sendJson(response, 201, { ok: true });
+        }
+        return sendJson(response, 404, { error: "Unknown endpoint" });
       }
 
       if (pathname.startsWith("/api/kv/") && request.method === "PUT") {

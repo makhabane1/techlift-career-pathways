@@ -10,12 +10,12 @@ const { createServer } = require("../server.js");
 const SKILLS = ["Responsive UI", "Visual hierarchy", "Interaction design"];
 
 // Each test gets its own server and data file.
-const start = async () => {
+const start = async (options = {}) => {
   const file = path.join(
     fs.mkdtempSync(path.join(os.tmpdir(), "techlift-")),
     "data.json",
   );
-  const server = createServer({ file });
+  const server = createServer({ file, ...options });
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
   return {
@@ -1189,6 +1189,220 @@ test("opportunity tracker: saves what the learner adds, checks it, and keeps it 
       cookie: nomsa.cookie,
     });
     assert.equal(mentorWrite.status, 403, "only learners have a tracker");
+  } finally {
+    await app.close();
+  }
+});
+
+test("build with me: signed-in learners post, join and leave groups, and only owners remove posts", async () => {
+  const app = await start();
+  try {
+    const anonymous = await request(app, "GET", "/api/community");
+    assert.equal(anonymous.status, 401);
+
+    const owner = await signupLearner(app, "owner@example.com");
+    const other = await signupLearner(app, "other@example.com");
+
+    const created = await request(app, "POST", "/api/community/groups", {
+      body: { title: "Frontend study circle", track: "frontend", summary: "Weekly CSS practice" },
+      cookie: owner.cookie,
+    });
+    assert.equal(created.status, 201);
+    assert.equal(created.json.mine, true);
+    assert.equal(created.json.memberCount, 1);
+    assert.equal(created.json.joined, true);
+    assert.equal(typeof created.json.ownerId, "string");
+    assert.equal(created.json.memberIds, undefined);
+    const groupId = created.json.id;
+
+    const seen = await request(app, "GET", "/api/community", { cookie: other.cookie });
+    assert.equal(seen.status, 200);
+    assert.equal(seen.json.groups.length, 1);
+    assert.equal(seen.json.groups[0].mine, false);
+    assert.equal(seen.json.groups[0].joined, false);
+
+    const joined = await request(app, "POST", `/api/community/groups/${groupId}/membership`, {
+      body: { joined: true },
+      cookie: other.cookie,
+    });
+    assert.equal(joined.status, 200);
+    assert.equal(joined.json.memberCount, 2);
+    assert.equal(joined.json.joined, true);
+
+    const creatorLeaves = await request(app, "POST", `/api/community/groups/${groupId}/membership`, {
+      body: { joined: false },
+      cookie: owner.cookie,
+    });
+    assert.equal(creatorLeaves.status, 400);
+
+    const strangerDeletes = await request(app, "DELETE", `/api/community/groups/${groupId}`, {
+      cookie: other.cookie,
+    });
+    assert.equal(strangerDeletes.status, 403);
+
+    const ownerDeletes = await request(app, "DELETE", `/api/community/groups/${groupId}`, {
+      cookie: owner.cookie,
+    });
+    assert.equal(ownerDeletes.status, 204);
+  } finally {
+    await app.close();
+  }
+});
+
+test("build with me: posts are validated and project partner listings keep their own fields", async () => {
+  const app = await start();
+  try {
+    const learner = await signupLearner(app, "validate@example.com");
+    const badTrack = await request(app, "POST", "/api/community/listings", {
+      body: { title: "Need a designer", track: "astrology", skills: "Figma" },
+      cookie: learner.cookie,
+    });
+    assert.equal(badTrack.status, 400);
+
+    const noTitle = await request(app, "POST", "/api/community/requests", {
+      body: { title: "   ", track: "frontend" },
+      cookie: learner.cookie,
+    });
+    assert.equal(noTitle.status, 400);
+
+    const badLink = await request(app, "POST", "/api/community/requests", {
+      body: { title: "Review my portfolio", track: "frontend", link: "javascript:alert(1)" },
+      cookie: learner.cookie,
+    });
+    assert.equal(badLink.status, 400);
+
+    const listing = await request(app, "POST", "/api/community/listings", {
+      body: {
+        title: "Looking for a UX partner",
+        track: "design",
+        skills: "Figma, research",
+        availability: "Weekday evenings",
+      },
+      cookie: learner.cookie,
+    });
+    assert.equal(listing.status, 201);
+    assert.equal(listing.json.skills, "Figma, research");
+    assert.equal(listing.json.availability, "Weekday evenings");
+  } finally {
+    await app.close();
+  }
+});
+
+test("build with me: reports hide a post from the reporter, then from everyone after three reports; blocks hide both ways", async () => {
+  const app = await start();
+  try {
+    const author = await signupLearner(app, "author@example.com");
+    const reporter = await signupLearner(app, "reporter@example.com");
+    const two = await signupLearner(app, "two@example.com");
+    const three = await signupLearner(app, "three@example.com");
+    const blocker = await signupLearner(app, "blocker@example.com");
+
+    const post = await request(app, "POST", "/api/community/requests", {
+      body: { title: "Feedback on my quiz", track: "frontend", summary: "Please look" },
+      cookie: author.cookie,
+    });
+    const postId = post.json.id;
+    const path = `/api/community/requests/${postId}/report`;
+
+    const ownReport = await request(app, "POST", path, {
+      body: { reason: "Testing" },
+      cookie: author.cookie,
+    });
+    assert.equal(ownReport.status, 400);
+
+    const noReason = await request(app, "POST", path, { body: { reason: " " }, cookie: reporter.cookie });
+    assert.equal(noReason.status, 400);
+
+    const reported = await request(app, "POST", path, {
+      body: { reason: "Spam" },
+      cookie: reporter.cookie,
+    });
+    assert.equal(reported.status, 201);
+
+    const reporterView = await request(app, "GET", "/api/community", { cookie: reporter.cookie });
+    assert.equal(reporterView.json.requests.length, 0);
+    const twoView = await request(app, "GET", "/api/community", { cookie: two.cookie });
+    assert.equal(twoView.json.requests.length, 1);
+
+    await request(app, "POST", path, { body: { reason: "Spam" }, cookie: two.cookie });
+    await request(app, "POST", path, { body: { reason: "Spam" }, cookie: three.cookie });
+    const hiddenForAll = await request(app, "GET", "/api/community", { cookie: blocker.cookie });
+    assert.equal(hiddenForAll.json.requests.length, 0);
+
+    const authorView = await request(app, "GET", "/api/community", { cookie: author.cookie });
+    assert.equal(authorView.json.requests.length, 1, "the author still sees their own post");
+
+    // Blocking hides posts in both directions until the block is removed.
+    const fresh = await request(app, "POST", "/api/community/listings", {
+      body: { title: "Pair on a Python script", track: "data", skills: "Python" },
+      cookie: author.cookie,
+    });
+    assert.equal(fresh.status, 201);
+    const blockedUser = await request(app, "GET", "/api/community", { cookie: author.cookie });
+    assert.equal(blockedUser.json.listings.length, 1);
+
+    const blockResponse = await request(app, "PUT", `/api/community/blocks/${author.json.id}`, {
+      cookie: blocker.cookie,
+    });
+    assert.equal(blockResponse.status, 204);
+    const blockerView = await request(app, "GET", "/api/community", { cookie: blocker.cookie });
+    assert.equal(blockerView.json.listings.length, 0);
+    assert.equal(blockerView.json.blocked[0].id, author.json.id);
+    const authorAfterBlock = await request(app, "GET", "/api/community", { cookie: author.cookie });
+    assert.equal(authorAfterBlock.json.listings.length, 1);
+
+    await request(app, "DELETE", `/api/community/blocks/${author.json.id}`, { cookie: blocker.cookie });
+    const restored = await request(app, "GET", "/api/community", { cookie: blocker.cookie });
+    assert.equal(restored.json.listings.length, 1);
+  } finally {
+    await app.close();
+  }
+});
+
+test("moderation: only named moderators see the report queue; keeping or removing a reported post clears its reports", async () => {
+  const app = await start({ moderators: ["mod@example.com"] });
+  try {
+    const author = await signupLearner(app, "poster@example.com");
+    const reporter = await signupLearner(app, "flagger@example.com");
+    const moderator = await signupLearner(app, "mod@example.com");
+
+    const post = await request(app, "POST", "/api/community/requests", {
+      body: { title: "Look at my quiz app", track: "frontend", summary: "Feedback please" },
+      cookie: author.cookie,
+    });
+    const postId = post.json.id;
+    await request(app, "POST", `/api/community/requests/${postId}/report`, {
+      body: { reason: "Off topic" },
+      cookie: reporter.cookie,
+    });
+
+    const notModerator = await request(app, "GET", "/api/community/moderation", { cookie: reporter.cookie });
+    assert.equal(notModerator.status, 403);
+
+    const queue = await request(app, "GET", "/api/community/moderation", { cookie: moderator.cookie });
+    assert.equal(queue.status, 200);
+    assert.equal(queue.json.length, 1);
+    assert.equal(queue.json[0].title, "Look at my quiz app");
+    assert.equal(queue.json[0].reportCount, 1);
+    assert.deepEqual(queue.json[0].reasons, ["Off topic"]);
+
+    const kept = await request(app, "POST", `/api/community/moderation/${postId}/dismiss`, { cookie: moderator.cookie });
+    assert.equal(kept.status, 204);
+    const emptied = await request(app, "GET", "/api/community/moderation", { cookie: moderator.cookie });
+    assert.equal(emptied.json.length, 0);
+    const stillPosted = await request(app, "GET", "/api/community", { cookie: reporter.cookie });
+    assert.equal(stillPosted.json.requests.length, 1, "keeping a post leaves it visible to others");
+
+    await request(app, "POST", `/api/community/requests/${postId}/report`, {
+      body: { reason: "Spam" },
+      cookie: reporter.cookie,
+    });
+    const removed = await request(app, "POST", `/api/community/moderation/${postId}/remove`, { cookie: moderator.cookie });
+    assert.equal(removed.status, 204);
+    const afterRemove = await request(app, "GET", "/api/community", { cookie: author.cookie });
+    assert.equal(afterRemove.json.requests.length, 0);
+    const queueAfter = await request(app, "GET", "/api/community/moderation", { cookie: moderator.cookie });
+    assert.equal(queueAfter.json.length, 0);
   } finally {
     await app.close();
   }
