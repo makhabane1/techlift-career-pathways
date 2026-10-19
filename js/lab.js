@@ -23,12 +23,15 @@ TechLiftStore.ready.then(() => {
     pending: "In mentor review",
   };
 
-  let activeTrack = user.path && trackIds.includes(user.path) ? user.path : "all";
+  let activeTrack =
+    user.path && trackIds.includes(user.path) ? user.path : "all";
   let selectedId = null;
 
   // Each challenge's latest submission by this learner, if any
   const submissionFor = (challengeId) =>
-    isLearner ? TechLiftStore.getSubmission(user.email || "", challengeId) : null;
+    isLearner
+      ? TechLiftStore.getSubmission(user.email || "", challengeId)
+      : null;
 
   const statusOf = (challengeId) => {
     const record = submissionFor(challengeId);
@@ -37,16 +40,27 @@ TechLiftStore.ready.then(() => {
   };
 
   const renderFilters = () => {
-    const options = [["all", "All tracks"], ...trackIds.map((id) => [id, TechLiftChallenges.label(id)])];
+    const options = [
+      ["all", "All tracks"],
+      ...trackIds.map((id) => [id, TechLiftChallenges.label(id)]),
+    ];
     filters.innerHTML = options
-      .map(([value, label]) => `<button type="button" class="filter-btn ${value === activeTrack ? "active" : ""}" data-track="${escapeHtml(value)}" aria-pressed="${value === activeTrack}">${escapeHtml(label)}</button>`)
+      .map(
+        ([value, label]) =>
+          `<button type="button" class="filter-btn ${value === activeTrack ? "active" : ""}" data-track="${escapeHtml(value)}" aria-pressed="${value === activeTrack}">${escapeHtml(label)}</button>`,
+      )
       .join("");
   };
 
   const renderList = () => {
     const challenges = trackIds
       .filter((id) => activeTrack === "all" || id === activeTrack)
-      .flatMap((track) => TechLiftChallenges.forTrack(track).map((challenge) => ({ ...challenge, track })));
+      .flatMap((track) =>
+        TechLiftChallenges.forTrack(track).map((challenge) => ({
+          ...challenge,
+          track,
+        })),
+      );
     list.innerHTML = challenges
       .map((challenge) => {
         const status = statusOf(challenge.id);
@@ -85,8 +99,12 @@ TechLiftStore.ready.then(() => {
           <h2 id="labDetailTitle">${escapeHtml(challenge.title)}</h2>
           <p>${escapeHtml(challenge.brief)}</p>
 
+          ${(content.prerequisites || []).length ? `<h3 class="lab-sub">Prerequisites</h3><ul class="plain-list">${content.prerequisites.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+
           <h3 class="lab-sub">What you will practise</h3>
           <ul class="plain-list">${content.objectives.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+
+          ${(content.instructions || []).length ? `<h3 class="lab-sub">Instructions</h3><ol class="lab-instructions">${content.instructions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>` : ""}
 
           <h3 class="lab-sub">What a reviewer looks for</h3>
           <ul class="plain-list">${content.acceptance.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
@@ -94,27 +112,41 @@ TechLiftStore.ready.then(() => {
           <h3 class="lab-sub">Skills scored (1 to 4 each)</h3>
           <ul class="skill-chips">${challenge.skills.map((skill) => `<li class="skill-chip">${escapeHtml(skill)}</li>`).join("")}</ul>
 
-          ${review ? `
+          ${
+            review
+              ? `
             <h3 class="lab-sub">Mentor feedback</h3>
             <p class="lab-feedback">${escapeHtml(review.feedback)}</p>
-            <ul class="skill-chips">${(review.rubric || []).map((item) => `<li class="skill-chip ${Number(item.score) >= 3 ? "verified" : ""}">${escapeHtml(item.skill)} · ${escapeHtml(item.score)}/4</li>`).join("")}</ul>` : ""}
+            <ul class="skill-chips">${(review.rubric || []).map((item) => `<li class="skill-chip ${Number(item.score) >= 3 ? "verified" : ""}">${escapeHtml(item.skill)} · ${escapeHtml(item.score)}/4</li>`).join("")}</ul>`
+              : ""
+          }
         </article>
 
         <div class="panel lab-submit">
-          ${!isLearner ? `
+          ${
+            !isLearner
+              ? `
             <p class="eyebrow">Submit your work</p>
             <h2>Sign in as a learner to submit</h2>
-            <div class="cta-row"><a class="btn btn-primary" href="login.html">Sign in</a><a class="btn btn-secondary" href="signup.html">Create an account</a></div>` : !sameTrack ? `
+            <div class="cta-row"><a class="btn btn-primary" href="login.html">Sign in</a><a class="btn btn-secondary" href="signup.html">Create an account</a></div>`
+              : !sameTrack
+                ? `
             <p class="eyebrow">Submit your work</p>
             <h2>This challenge is in another track</h2>
-            <p class="muted">Submissions are for challenges in your learning track (${escapeHtml(TechLiftChallenges.label(user.path || "frontend"))}). Choose this track in the Career DNA page or the route builder to work on it.</p>` : `
+            <p class="muted">Submissions are for challenges in your learning track (${escapeHtml(TechLiftChallenges.label(user.path || "frontend"))}). Choose this track in the Career DNA page or the route builder to work on it.</p>`
+                : `
             <p class="eyebrow">Submit your work</p>
             <h2>${record ? "Update your submission" : "Submit your work"}</h2>
             <form id="labForm" class="lab-form" novalidate>
               <label>
                 <span class="field-label">Type of evidence</span>
                 <select name="kind">
-                  ${Object.entries(kinds).map(([value, label]) => `<option value="${value}" ${record?.kind === value ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+                  ${Object.entries(kinds)
+                    .map(
+                      ([value, label]) =>
+                        `<option value="${value}" ${record?.kind === value ? "selected" : ""}>${escapeHtml(label)}</option>`,
+                    )
+                    .join("")}
                 </select>
               </label>
               <label>
@@ -125,17 +157,22 @@ TechLiftStore.ready.then(() => {
                 <span class="field-label">What did you build, and what did you decide?</span>
                 <textarea name="description" rows="5" required maxlength="5000" placeholder="Describe the work, the decisions you made, and what you would change next.">${escapeHtml(record?.description || "")}</textarea>
               </label>
-              ${needsNote ? `
+              ${
+                needsNote
+                  ? `
                 <label>
                   <span class="field-label">What changed since the last feedback?</span>
                   <textarea name="changeNote" rows="3" required maxlength="1000"></textarea>
-                </label>` : ""}
+                </label>`
+                  : ""
+              }
               <p id="labError" class="form-error" role="alert"></p>
               <div class="cta-row">
                 <button class="btn btn-primary" type="submit">${record ? "Send update" : "Submit for review"}</button>
                 <button class="btn btn-secondary" type="button" id="labStart">Work on this on my dashboard</button>
               </div>
-            </form>`}
+            </form>`
+          }
         </div>
       </div>`;
   };
@@ -143,9 +180,12 @@ TechLiftStore.ready.then(() => {
   const checkSubmission = (form) => {
     const kind = form.elements.kind.value;
     const url = form.elements.url.value.trim();
-    if (kind === "github" && !/^https:\/\/github\.com\//i.test(url)) return "A GitHub submission needs a link that starts with https://github.com/.";
-    if ((kind === "deployed" || kind === "screenshot") && !url) return "Add a link to the deployed project or the screenshot.";
-    if (url && !/^https?:\/\//i.test(url)) return "The link must start with http:// or https://";
+    if (kind === "github" && !/^https:\/\/github\.com\//i.test(url))
+      return "A GitHub submission needs a link that starts with https://github.com/.";
+    if ((kind === "deployed" || kind === "screenshot") && !url)
+      return "Add a link to the deployed project or the screenshot.";
+    if (url && !/^https?:\/\//i.test(url))
+      return "The link must start with http:// or https://";
     return "";
   };
 
@@ -180,7 +220,10 @@ TechLiftStore.ready.then(() => {
     }
 
     const challenge = findChallenge(selectedId);
-    const existing = TechLiftStore.getSubmission(user.email || "", challenge.id);
+    const existing = TechLiftStore.getSubmission(
+      user.email || "",
+      challenge.id,
+    );
     const record = {
       challengeId: challenge.id,
       challenge: challenge.title,
@@ -190,7 +233,9 @@ TechLiftStore.ready.then(() => {
       description: form.elements.description.value.trim(),
       url: form.elements.url.value.trim(),
       kind: form.elements.kind.value,
-      changeNote: form.elements.changeNote ? form.elements.changeNote.value.trim() : "",
+      changeNote: form.elements.changeNote
+        ? form.elements.changeNote.value.trim()
+        : "",
       submittedAt: new Date().toISOString(),
       review: existing?.review || null,
     };
