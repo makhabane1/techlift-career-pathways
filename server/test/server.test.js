@@ -1407,3 +1407,58 @@ test("moderation: only named moderators see the report queue; keeping or removin
     await app.close();
   }
 });
+
+test("moderation: authors are told when a post is hidden for review and when a moderator removes it, with the note", async () => {
+  const app = await start({ moderators: ["mod@example.com"] });
+  try {
+    const author = await signupLearner(app, "writer@example.com");
+    const moderator = await signupLearner(app, "mod@example.com");
+    const reporters = [
+      await signupLearner(app, "r1@example.com"),
+      await signupLearner(app, "r2@example.com"),
+      await signupLearner(app, "r3@example.com"),
+    ];
+    const post = await request(app, "POST", "/api/community/requests", {
+      body: { title: "My API project", track: "backend", summary: "Review please" },
+      cookie: author.cookie,
+    });
+    const postId = post.json.id;
+
+    for (const reporter of reporters.slice(0, 2)) {
+      await request(app, "POST", `/api/community/requests/${postId}/report`, {
+        body: { reason: "Unclear" },
+        cookie: reporter.cookie,
+      });
+    }
+    let notes = await request(app, "GET", "/api/notifications", { cookie: author.cookie });
+    assert.equal(notes.json.length, 0, "no notice before the threshold");
+
+    await request(app, "POST", `/api/community/requests/${postId}/report`, {
+      body: { reason: "Unclear" },
+      cookie: reporters[2].cookie,
+    });
+    notes = await request(app, "GET", "/api/notifications", { cookie: author.cookie });
+    assert.equal(notes.json.length, 1);
+    assert.match(notes.json[0].message, /hidden while a moderator reviews/);
+
+    const removed = await request(app, "POST", `/api/community/moderation/${postId}/remove`, {
+      body: { note: "Breaks the community guidelines" },
+      cookie: moderator.cookie,
+    });
+    assert.equal(removed.status, 204);
+    notes = await request(app, "GET", "/api/notifications", { cookie: author.cookie });
+    assert.equal(notes.json.length, 2);
+    assert.match(notes.json[1].message, /removed your post "My API project"\. Reason: Breaks the community guidelines/);
+
+    // The action is logged against the post, with the moderator's account id.
+    const log = await request(app, "GET", "/api/community/moderation", { cookie: moderator.cookie });
+    assert.equal(log.status, 200);
+    const saved = JSON.parse(fs.readFileSync(app.file, "utf8"));
+    assert.equal(saved.community.moderationLog.length, 1);
+    assert.equal(saved.community.moderationLog[0].action, "remove");
+    assert.equal(saved.community.moderationLog[0].targetId, postId);
+    assert.equal(saved.community.moderationLog[0].moderatorId, moderator.json.id);
+  } finally {
+    await app.close();
+  }
+});

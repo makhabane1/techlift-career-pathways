@@ -981,7 +981,14 @@ const MODERATOR_EMAILS = (process.env.TECHLIFT_MODERATORS || "")
   .filter(Boolean);
 
 function emptyCommunity() {
-  return { groups: [], listings: [], requests: [], reports: [], blocks: {} };
+  return {
+    groups: [],
+    listings: [],
+    requests: [],
+    reports: [],
+    blocks: {},
+    moderationLog: [],
+  };
 }
 
 const cleanTrack = (value) => {
@@ -1059,6 +1066,20 @@ const reportCommunityItem = (data, account, kind, id, reason) => {
       reason: note,
       createdAt: new Date().toISOString(),
     });
+    const reporters = new Set(
+      data.community.reports
+        .filter((report) => report.targetId === id)
+        .map((report) => report.reporterId),
+    );
+    // Tell the author once, when the post is hidden pending review.
+    if (reporters.size === REPORTS_TO_HIDE) {
+      notify(
+        data,
+        item.ownerId,
+        `Your post "${item.title}" is hidden while a moderator reviews reports on it.`,
+        "community.html",
+      );
+    }
   }
 };
 
@@ -1101,11 +1122,31 @@ const communityCard = (kind, item, viewerId) => {
   return card;
 };
 
-const removeCommunityItem = (data, kind, id) => {
+// Moderator actions are logged by action and target only, never by who
+// performed them beyond the account id, so the log stays small.
+const logModeration = (data, moderator, action, kind, id) => {
+  data.community.moderationLog.push({
+    action,
+    targetKind: kind,
+    targetId: id,
+    moderatorId: moderator.id,
+    at: new Date().toISOString(),
+  });
+  data.community.moderationLog = data.community.moderationLog.slice(-500);
+};
+
+const removeCommunityItem = (data, kind, id, note = "") => {
   const item = findCommunityItem(data, kind, id);
   data.community[kind] = data.community[kind].filter((entry) => entry !== item);
   data.community.reports = data.community.reports.filter(
     (report) => report.targetId !== id,
+  );
+  const reason = note ? ` Reason: ${note}` : "";
+  notify(
+    data,
+    item.ownerId,
+    `A moderator removed your post "${item.title}".${reason}`,
+    "community.html",
   );
 };
 
@@ -1395,12 +1436,16 @@ const createServer = ({ file = DATA_FILE, moderators = MODERATOR_EMAILS } = {}) 
             const report = data.community.reports.find((entry) => entry.targetId === id);
             if (!report) fail(404, "No open reports for that post");
             if (action === "remove") {
-              removeCommunityItem(data, report.targetKind, id);
+              // The note is optional, so a request with no body is still valid.
+              const body = request.headers["content-type"] ? await readJson(request) : null;
+              const note = text(body?.note ?? "", REPORT_REASON_LIMIT, "Note");
+              removeCommunityItem(data, report.targetKind, id, note);
             } else {
               data.community.reports = data.community.reports.filter(
                 (entry) => entry.targetId !== id,
               );
             }
+            logModeration(data, account, action, report.targetKind, id);
             await persist(data);
             response.writeHead(204).end();
             return;

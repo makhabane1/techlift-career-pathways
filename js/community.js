@@ -142,6 +142,10 @@ TechLiftStore.ready.then(() => {
         <h3>${escapeHtml(entry.title)}</h3>
       </header>
       <ul>${entry.reasons.map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul>
+      <label class="community-note-field">
+        Note for the author (optional, shown only if you remove the post)
+        <textarea rows="2" maxlength="300" data-moderation-note="${escapeHtml(entry.targetId)}"></textarea>
+      </label>
       <div class="community-actions">
         <button class="btn btn-secondary" type="button" data-moderate="dismiss" data-id="${escapeHtml(entry.targetId)}">Keep post</button>
         <button class="btn btn-secondary" type="button" data-moderate="remove" data-id="${escapeHtml(entry.targetId)}">Remove post</button>
@@ -249,8 +253,13 @@ TechLiftStore.ready.then(() => {
     if (!button) return;
     const { moderate, id } = button.dataset;
     if (moderate === "remove" && !window.confirm("Remove this post for everyone? This cannot be undone.")) return;
+    const noteField = moderationList.querySelector(`[data-moderation-note="${CSS.escape(id)}"]`);
+    const note = noteField ? noteField.value.trim() : "";
     runAction(
-      () => request("POST", `/api/community/moderation/${id}/${moderate}`),
+      () =>
+        moderate === "remove"
+          ? request("POST", `/api/community/moderation/${id}/remove`, { note })
+          : request("POST", `/api/community/moderation/${id}/dismiss`),
       moderate === "remove" ? "Post removed for everyone." : "Post kept. Its reports are cleared.",
     );
   });

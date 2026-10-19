@@ -39,6 +39,18 @@ Data is stored in `data/techlift-data.json`, which is git-ignored. Pages that ne
 
 Google Fonts are loaded from a CDN, so an internet connection is needed for the intended typography.
 
+## Build With Me moderation
+
+Learners can post study groups, project partner listings, and feedback requests on `community.html`. Members can report a post; a post reported by three different accounts is hidden from everyone until a moderator reviews it, and its author is told it is under review.
+
+Moderators are not created by the app. Name them when you start the server, as a comma-separated list of account emails:
+
+```
+TECHLIFT_MODERATORS=you@example.com npm start
+```
+
+A moderator sees a queue on `community.html`. They can keep a reported post, which clears its reports, or remove it with an optional note that the author receives. Each action is recorded in the data file with the target and the moderator's account id. There is no appeal screen yet.
+
 ## Pages
 
 - `index.html` — TechLift overview and mentor directory
