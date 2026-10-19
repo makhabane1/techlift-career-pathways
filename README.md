@@ -15,6 +15,7 @@ TechLift is a front-end prototype for a guided tech-learning experience. It help
 - Skills passport with verified skills, evidence links, and print or save-as-PDF
 - Proof Wall portfolio with editable project stories, optional public sharing, and separate labels for self-described work and mentor-reviewed evidence
 - Interview Gym with role-specific questions, STAR answer practice, private self-review history, and saved-opportunity context
+- Learning Planner and Life Rhythm with self-reported weekly availability, energy, confidence, priorities, route-based task suggestions, and persistent progress
 - Peer review circles, unlocked after a learner's own work is approved; mentors spot-check peer reviews
 - Mentor matching by expertise, with badges for turnaround, feedback depth, and calibration
 - Mentor calibration: compares mentors who score the same challenge and flags outliers
@@ -50,6 +51,7 @@ Google Fonts are loaded from a CDN, so an internet connection is needed for the 
 - `passport.html` — learner skills passport
 - `portfolio.html` — private portfolio editor and optional public Proof Wall link
 - `interview.html` — learner-private interview practice and saved sessions
+- `planner.html` — private weekly plan and Life Rhythm check-in
 - `career-dna.html` — Career DNA: six questions match your interests, working style, existing skills, time, and budget to career profiles. Each match explains why it came up. Careers without TechLift challenges are labelled as such
 - `bridge.html` — My roadmap (The Bridge): your chosen career on the existing career map. A milestone is complete when its skills are verified and its challenges are approved
 - `route.html` — route builder: track, known skills, weekly hours, and budget give an ordered challenge route, time estimate, skill gaps, and resources; signed-in learners save progress
