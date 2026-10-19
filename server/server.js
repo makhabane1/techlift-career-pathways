@@ -335,6 +335,8 @@ const saveMentorProfile = (data, account, value) => {
   };
 };
 
+const SUBMISSION_KINDS = ["github", "deployed", "screenshot", "link", "written"];
+
 const saveLearnerSubmission = (data, account, key, challengeId, value) => {
   const challenge = TechLiftChallenges.find(challengeId);
   const profile = data.learnerProfiles[account.id] || {};
@@ -346,8 +348,14 @@ const saveLearnerSubmission = (data, account, key, challengeId, value) => {
   const url = text(value.url ?? "", 300, "Link");
   if (url && !/^https?:\/\//i.test(url)) fail(400, "Link must start with http or https");
 
+  // What kind of evidence this is. A GitHub submission must point at github.com.
+  const kind = SUBMISSION_KINDS.includes(value.kind) ? value.kind : url ? "link" : "written";
+  if (kind === "github" && !/^https:\/\/github\.com\//i.test(url)) fail(400, "A GitHub submission needs a github.com link");
+  if ((kind === "deployed" || kind === "screenshot") && !url) fail(400, "Add a link to the deployed project or screenshot");
+
   const existing = data.submissions[key];
   const base = {
+    kind,
     challengeId,
     challenge: challenge.title,
     path: challenge.track,

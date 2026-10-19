@@ -657,3 +657,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Challenge Lab */
+.lab-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.lab-brief,
+.lab-submit {
+  display: grid;
+  gap: 14px;
+  padding: 26px;
+  min-width: 0;
+}
+
+.lab-sub {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+
+.lab-feedback {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--primary);
+  background: var(--surface-alt);
+}
+
+.lab-form {
+  display: grid;
+  gap: 14px;
+}
+
+.lab-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.lab-form input,
+.lab-form select,
+.lab-form textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .lab-layout {
+    grid-template-columns: 1fr;
+  }
+}
