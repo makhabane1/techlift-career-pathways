@@ -22,13 +22,15 @@ const TechLiftStore = (() => {
     }).then(async (response) => {
       if (response.ok) return;
       const detail = await response.json().catch(() => ({}));
-      throw new Error(detail.error || `Save failed with status ${response.status}`);
+      throw new Error(
+        detail.error || `Save failed with status ${response.status}`,
+      );
     });
 
   const read = (key, fallback) => {
     try {
       const raw = cache[key];
-      return raw === undefined ? fallback : JSON.parse(raw) ?? fallback;
+      return raw === undefined ? fallback : (JSON.parse(raw) ?? fallback);
     } catch {
       return fallback;
     }
@@ -57,12 +59,17 @@ const TechLiftStore = (() => {
     });
 
   const wordCount = (text) =>
-    String(text || "").trim().split(/\s+/).filter(Boolean).length;
+    String(text || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
 
   const hoursBetween = (start, end) => (new Date(end) - new Date(start)) / 36e5;
 
   const average = (list) =>
-    list.length ? list.reduce((total, value) => total + value, 0) / list.length : null;
+    list.length
+      ? list.reduce((total, value) => total + value, 0) / list.length
+      : null;
 
   // ---- Session -----------------------------------------------------------
 
@@ -70,7 +77,8 @@ const TechLiftStore = (() => {
 
   const loadState = async () => {
     const response = await fetch("/api/state", { cache: "no-store" });
-    if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+    if (!response.ok)
+      throw new Error(`Server responded with ${response.status}`);
     const state = await response.json();
     Object.keys(cache).forEach((key) => delete cache[key]);
     Object.entries(state).forEach(([key, value]) => {
@@ -80,7 +88,10 @@ const TechLiftStore = (() => {
 
   // Pages that need an account redirect to login when no session is loaded.
   const ready = loadState().catch((error) => {
-    console.error("Could not load TechLift data. Is the server running?", error);
+    console.error(
+      "Could not load TechLift data. Is the server running?",
+      error,
+    );
   });
 
   const postJson = async (url, body) => {
@@ -90,7 +101,10 @@ const TechLiftStore = (() => {
       body: JSON.stringify(body),
     });
     const detail = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(detail.error || `Request failed with status ${response.status}`);
+    if (!response.ok)
+      throw new Error(
+        detail.error || `Request failed with status ${response.status}`,
+      );
     return detail;
   };
 
@@ -119,7 +133,9 @@ const TechLiftStore = (() => {
       return false;
     }
     if (account.role !== role) {
-      window.location.replace(account.role === "mentor" ? "mentor-dashboard.html" : "dashboard.html");
+      window.location.replace(
+        account.role === "mentor" ? "mentor-dashboard.html" : "dashboard.html",
+      );
       return false;
     }
     return true;
@@ -129,7 +145,17 @@ const TechLiftStore = (() => {
 
   const getUser = () => read(KEYS.user, null);
 
-  const saveUser = (patch) => write(KEYS.user, { ...(getUser() || {}), ...patch });
+  const saveUser = (patch) =>
+    write(KEYS.user, { ...(getUser() || {}), ...patch });
+
+  const saveUserConfirmed = async (patch) => {
+    const value = { ...(getUser() || {}), ...patch };
+    const raw = JSON.stringify(value);
+    await saveRemote(KEYS.user, raw);
+    cache[KEYS.user] = raw;
+    await loadState();
+    return getUser();
+  };
 
   // ---- Submissions -------------------------------------------------------
   // One record per learner per challenge. Keys use the learner's account id,
@@ -161,10 +187,12 @@ const TechLiftStore = (() => {
       .filter((key) => key.startsWith(SUBMISSION_PREFIX))
       .forEach((key) => {
         const record = read(key, null);
-        if (record && record.description) submissions.push(normalize(record, key));
+        if (record && record.description)
+          submissions.push(normalize(record, key));
       });
     return submissions.sort(
-      (first, second) => new Date(second.submittedAt || 0) - new Date(first.submittedAt || 0),
+      (first, second) =>
+        new Date(second.submittedAt || 0) - new Date(first.submittedAt || 0),
     );
   };
 
@@ -176,7 +204,10 @@ const TechLiftStore = (() => {
 
   const saveSubmission = (record) => {
     const { storageKey, ...data } = record;
-    return write(storageKey || submissionKey(data.email, data.challengeId), data);
+    return write(
+      storageKey || submissionKey(data.email, data.challengeId),
+      data,
+    );
   };
 
   // ---- Rubrics -----------------------------------------------------------
@@ -198,7 +229,9 @@ const TechLiftStore = (() => {
   const weakestSkill = (review) => {
     const scored = (review?.rubric || []).filter((item) => Number(item.score));
     if (!scored.length) return null;
-    return scored.reduce((lowest, item) => (Number(item.score) < Number(lowest.score) ? item : lowest));
+    return scored.reduce((lowest, item) =>
+      Number(item.score) < Number(lowest.score) ? item : lowest,
+    );
   };
 
   // ---- Mentors -----------------------------------------------------------
@@ -207,7 +240,8 @@ const TechLiftStore = (() => {
 
   const getMentorDirectory = () => read(KEYS.mentorDirectory, []);
 
-  const getMentor = (id) => getMentorDirectory().find((mentor) => mentor.id === id) || null;
+  const getMentor = (id) =>
+    getMentorDirectory().find((mentor) => mentor.id === id) || null;
 
   // The server assigns the id and updates the directory.
   const saveMentorProfile = (profile) => {
@@ -238,12 +272,16 @@ const TechLiftStore = (() => {
 
     return Object.entries(byChallenge)
       .map(([challengeId, challenge]) => {
-        const reviewers = Object.values(challenge.reviewers).map((reviewer) => ({
-          ...reviewer,
-          average: average(reviewer.scores),
-        }));
+        const reviewers = Object.values(challenge.reviewers).map(
+          (reviewer) => ({
+            ...reviewer,
+            average: average(reviewer.scores),
+          }),
+        );
         if (reviewers.length < 2) return null;
-        const groupMean = average(reviewers.map((reviewer) => reviewer.average));
+        const groupMean = average(
+          reviewers.map((reviewer) => reviewer.average),
+        );
         return {
           challengeId,
           title: challenge.title,
@@ -253,7 +291,8 @@ const TechLiftStore = (() => {
             // With two mentors each is always the same distance from the mean,
             // so the honest signal is the gap itself, not an outlier.
             let flag = "aligned";
-            if (Math.abs(deviation) >= 0.75) flag = reviewers.length >= 3 ? "outlier" : "gap";
+            if (Math.abs(deviation) >= 0.75)
+              flag = reviewers.length >= 3 ? "outlier" : "gap";
             return { ...reviewer, deviation, flag };
           }),
         };
@@ -265,7 +304,8 @@ const TechLiftStore = (() => {
     const flags = {};
     calibrationReport().forEach((row) =>
       row.reviewers.forEach((reviewer) => {
-        if (flags[reviewer.id] !== "outlier") flags[reviewer.id] = reviewer.flag;
+        if (flags[reviewer.id] !== "outlier")
+          flags[reviewer.id] = reviewer.flag;
       }),
     );
     return flags;
@@ -273,22 +313,30 @@ const TechLiftStore = (() => {
 
   const mentorStats = (mentorId) => {
     const reviews = getAllSubmissions().filter(
-      (submission) => submission.review?.reviewerId === mentorId && submission.review.reviewedAt,
+      (submission) =>
+        submission.review?.reviewerId === mentorId &&
+        submission.review.reviewedAt,
     );
     return {
       count: reviews.length,
       avgHours: average(
-        reviews.map((submission) => hoursBetween(submission.submittedAt, submission.review.reviewedAt)),
+        reviews.map((submission) =>
+          hoursBetween(submission.submittedAt, submission.review.reviewedAt),
+        ),
       ),
-      avgWords: average(reviews.map((submission) => wordCount(submission.review.feedback))),
+      avgWords: average(
+        reviews.map((submission) => wordCount(submission.review.feedback)),
+      ),
       calibration: calibrationFlags()[mentorId] || null,
     };
   };
 
   const mentorBadges = (stats) => {
     const badges = [];
-    if (stats.avgHours !== null && stats.avgHours <= 48) badges.push("Fast turnaround");
-    if (stats.avgWords !== null && stats.avgWords >= 30) badges.push("Detailed feedback");
+    if (stats.avgHours !== null && stats.avgHours <= 48)
+      badges.push("Fast turnaround");
+    if (stats.avgWords !== null && stats.avgWords >= 30)
+      badges.push("Detailed feedback");
     if (stats.calibration === "aligned") badges.push("Calibrated");
     return badges;
   };
@@ -325,7 +373,9 @@ const TechLiftStore = (() => {
             entries.push({
               skill: item.skill,
               score: Number(item.score),
-              challenge: TechLiftChallenges.find(submission.challengeId)?.title || submission.challenge,
+              challenge:
+                TechLiftChallenges.find(submission.challengeId)?.title ||
+                submission.challenge,
               challengeId: submission.challengeId,
               mentor: round.review.reviewerName || "Mentor",
               reviewedAt: round.review.reviewedAt,
@@ -334,7 +384,10 @@ const TechLiftStore = (() => {
           );
         });
       });
-    return entries.sort((first, second) => new Date(second.reviewedAt) - new Date(first.reviewedAt));
+    return entries.sort(
+      (first, second) =>
+        new Date(second.reviewedAt) - new Date(first.reviewedAt),
+    );
   };
 
   // Every element with data-logout signs the person out.
@@ -353,7 +406,10 @@ const TechLiftStore = (() => {
     document.querySelectorAll("[data-account-link]").forEach((link) => {
       if (!account) return;
       link.textContent = "Dashboard";
-      link.setAttribute("href", account.role === "mentor" ? "mentor-dashboard.html" : "dashboard.html");
+      link.setAttribute(
+        "href",
+        account.role === "mentor" ? "mentor-dashboard.html" : "dashboard.html",
+      );
     });
   });
 
@@ -362,7 +418,8 @@ const TechLiftStore = (() => {
     return response.ok ? response.json() : [];
   };
 
-  const markNotificationsRead = () => fetch("/api/notifications/read", { method: "POST" });
+  const markNotificationsRead = () =>
+    fetch("/api/notifications/read", { method: "POST" });
 
   return {
     KEYS,
@@ -380,6 +437,7 @@ const TechLiftStore = (() => {
     wordCount,
     getUser,
     saveUser,
+    saveUserConfirmed,
     submissionKey,
     getAllSubmissions,
     getSubmission,

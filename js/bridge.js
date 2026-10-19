@@ -118,6 +118,7 @@ TechLiftStore.ready.then(() => {
             <ul class="plain-list">
               <li><a class="text-link" href="passport.html">Skill passport: ${verified.size} verified ${verified.size === 1 ? "skill" : "skills"}</a></li>
               <li><a class="text-link" href="opportunities.html#tracker">Opportunity tracker: ${(user.opportunities || []).length} saved</a></li>
+              <li><a class="text-link" href="interview.html">Interview Gym: ${(user.interviewPractice || []).length} saved sessions</a></li>
               <li><a class="text-link" href="route.html?track=${escapeHtml(career.track || "frontend")}">Route builder for this track</a></li>
             </ul>
           </div>

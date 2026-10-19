@@ -34,11 +34,14 @@
         <nav class="main-nav" aria-label="Main navigation">
           <a href="dashboard.html">Dashboard</a>
           <a href="passport.html" aria-current="page">Passport</a>
+          <a href="portfolio.html">Proof Wall</a>
           <a href="programs.html">Programs</a>
         </nav>
         <div class="nav-actions">
           <a class="btn btn-primary" href="dashboard.html">Back to dashboard</a>
-          <button class="text-link button-link" type="button" data-logout>Log out</button>
+          <button class="text-link button-link" type="button" data-logout>
+            Log out
+          </button>
         </div>
         <button
           class="theme-toggle"
@@ -60,19 +63,29 @@
             <h1>Verified skills</h1>
             <p class="lede">
               A skill appears here when a mentor scores it 3 or higher on an
-              approved submission. Each entry links back to the work it came from.
+              approved submission. Each entry links back to the work it came
+              from.
             </p>
           </div>
-          <button class="btn btn-primary" type="button" id="printPassport">
-            Print or save as PDF
-          </button>
+          <div class="cta-row">
+            <a class="btn btn-secondary" href="portfolio.html"
+              >Build your Proof Wall</a
+            >
+            <button class="btn btn-primary" type="button" id="printPassport">
+              Print or save as PDF
+            </button>
+          </div>
         </div>
 
-        <article class="panel passport-card" id="passportCard" aria-live="polite"></article>
+        <article
+          class="panel passport-card"
+          id="passportCard"
+          aria-live="polite"
+        ></article>
 
         <p class="passport-note no-print">
-          This passport lives in this browser only. A public, shareable link
-          needs the backend described in the README.
+          Your Skill Passport is private to your account. You can choose which
+          approved challenge evidence to share on your Proof Wall.
         </p>
       </div>
     </main>

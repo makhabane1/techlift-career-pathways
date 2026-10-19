@@ -1,10 +1,14 @@
 TechLiftStore.ready.then(() => {
   if (!TechLiftStore.ensureRole("mentor")) return;
-  const { escapeHtml, SCORE_LABELS, getAllSubmissions, saveSubmission } = TechLiftStore;
+  const { escapeHtml, SCORE_LABELS, getAllSubmissions, saveSubmission } =
+    TechLiftStore;
   const submissionList = document.getElementById("submissionList");
   const emptyQueue = document.getElementById("emptyQueue");
+  const emptyQueueTitle = document.getElementById("emptyQueueTitle");
+  const emptyQueueMessage = document.getElementById("emptyQueueMessage");
   const reviewCount = document.getElementById("reviewCount");
   const submissionFilter = document.getElementById("submissionFilter");
+  const submissionSearch = document.getElementById("submissionSearch");
   const mentorStatsPanel = document.getElementById("mentorStatsPanel");
   const calibrationPanel = document.getElementById("calibrationPanel");
   const spotCheckPanel = document.getElementById("spotCheckPanel");
@@ -23,23 +27,33 @@ TechLiftStore.ready.then(() => {
 
   const formatDate = (value) =>
     value
-      ? new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+      ? new Date(value).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
       : "Date not available";
 
   const anchorText = (skill, score) =>
-    score ? TechLiftRubric.anchor(skill, Number(score)) : "Choose a score to see what it looks like.";
+    score
+      ? TechLiftRubric.anchor(skill, Number(score))
+      : "Choose a score to see what it looks like.";
 
   const scoreOptions = (selected) =>
     `<option value="" disabled ${selected ? "" : "selected"}>Score</option>` +
     [1, 2, 3, 4]
-      .map((score) => `<option value="${score}" ${Number(selected) === score ? "selected" : ""}>${score} · ${SCORE_LABELS[score]}</option>`)
+      .map(
+        (score) =>
+          `<option value="${score}" ${Number(selected) === score ? "selected" : ""}>${score} · ${SCORE_LABELS[score]}</option>`,
+      )
       .join("");
 
   const reviewFormFor = (submission) => {
     const state = getState(submission);
     const locked = state === "approved";
     const disabled = locked ? "disabled" : "";
-    const skills = TechLiftChallenges.find(submission.challengeId)?.skills ||
+    const skills =
+      TechLiftChallenges.find(submission.challengeId)?.skills ||
       (submission.review?.rubric || []).map((item) => item.skill);
     const current = submission.review?.rubric || [];
     const previous = submission.history.at(-1)?.review?.rubric || [];
@@ -120,11 +134,33 @@ TechLiftStore.ready.then(() => {
   const renderQueue = () => {
     const submissions = getAllSubmissions();
     const filter = submissionFilter.value;
-    const filtered = submissions.filter((submission) => filter === "all" || getState(submission) === filter);
-    const pendingCount = submissions.filter((submission) => getState(submission) === "pending").length;
+    const query = submissionSearch.value.trim().toLocaleLowerCase();
+    const filtered = submissions.filter((submission) => {
+      if (filter !== "all" && getState(submission) !== filter) return false;
+      const searchable = [
+        submission.fullName,
+        submission.email,
+        submission.challenge,
+        TechLiftChallenges.label(submission.path),
+        submission.description,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase();
+      return !query || searchable.includes(query);
+    });
+    const pendingCount = submissions.filter(
+      (submission) => getState(submission) === "pending",
+    ).length;
 
     reviewCount.textContent = pendingCount;
     emptyQueue.classList.toggle("hidden", filtered.length > 0);
+    emptyQueueTitle.textContent = submissions.length
+      ? "No matching submissions"
+      : "All caught up";
+    emptyQueueMessage.textContent = submissions.length
+      ? "Try a different learner, challenge, or status filter."
+      : "New learner project submissions will appear here.";
     submissionList.innerHTML = filtered.map(submissionCard).join("");
   };
 
@@ -138,7 +174,8 @@ TechLiftStore.ready.then(() => {
         : stats.avgHours < 48
           ? `${Math.max(1, Math.round(stats.avgHours))} hours`
           : `${(stats.avgHours / 24).toFixed(1)} days`;
-    const words = stats.avgWords === null ? "—" : `${Math.round(stats.avgWords)} words`;
+    const words =
+      stats.avgWords === null ? "—" : `${Math.round(stats.avgWords)} words`;
 
     mentorStatsPanel.innerHTML = `
       <p class="eyebrow">Your reviewer profile</p>
@@ -149,14 +186,21 @@ TechLiftStore.ready.then(() => {
         <div><dt>Average feedback length</dt><dd>${words}</dd></div>
       </dl>
       <div class="badge-row">
-        ${badges.length
-          ? badges.map((badge) => `<span class="badge">${escapeHtml(badge)}</span>`).join("")
-          : `<span class="muted">Badges appear as you review submissions.</span>`}
+        ${
+          badges.length
+            ? badges
+                .map(
+                  (badge) => `<span class="badge">${escapeHtml(badge)}</span>`,
+                )
+                .join("")
+            : `<span class="muted">Badges appear as you review submissions.</span>`
+        }
       </div>`;
   };
 
   const calibrationLabel = (reviewer, groupSize) => {
-    if (reviewer.flag === "outlier") return "Outlier: schedule a calibration session";
+    if (reviewer.flag === "outlier")
+      return "Outlier: schedule a calibration session";
     if (reviewer.flag === "gap") {
       return `Gap of ${Math.abs(reviewer.deviation).toFixed(1)} points: compare notes on this challenge`;
     }
@@ -203,7 +247,9 @@ TechLiftStore.ready.then(() => {
     const body = reviews.length
       ? reviews
           .map((review) => {
-            const peer = submissions.find((submission) => submission.storageKey === review.submissionKey);
+            const peer = submissions.find(
+              (submission) => submission.storageKey === review.submissionKey,
+            );
             const scores = (review.rubric || [])
               .map(
                 (item) => `
@@ -258,7 +304,9 @@ TechLiftStore.ready.then(() => {
     const action = event.submitter?.dataset.review;
     if (!action) return;
 
-    const record = getAllSubmissions().find((submission) => submission.storageKey === form.dataset.key);
+    const record = getAllSubmissions().find(
+      (submission) => submission.storageKey === form.dataset.key,
+    );
     if (!record) return;
 
     if (action === "reopen") {
@@ -314,9 +362,13 @@ TechLiftStore.ready.then(() => {
   submissionList.addEventListener("change", (event) => {
     if (!event.target.matches('select[name="score"]')) return;
     const row = event.target.closest(".rubric-row");
-    row.querySelector(".rubric-anchor").textContent = anchorText(row.dataset.skill, event.target.value);
+    row.querySelector(".rubric-anchor").textContent = anchorText(
+      row.dataset.skill,
+      event.target.value,
+    );
   });
 
   submissionFilter.addEventListener("change", renderQueue);
+  submissionSearch.addEventListener("input", renderQueue);
   renderAll();
 });

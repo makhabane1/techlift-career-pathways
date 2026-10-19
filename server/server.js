@@ -15,7 +15,9 @@ const TechLiftCareers = require("../js/careers-data.js");
 
 const scrypt = promisify(crypto.scrypt);
 const ROOT = path.resolve(__dirname, "..");
-const DATA_FILE = process.env.TECHLIFT_DATA_FILE || path.join(ROOT, "data", "techlift-data.json");
+const DATA_FILE =
+  process.env.TECHLIFT_DATA_FILE ||
+  path.join(ROOT, "data", "techlift-data.json");
 const SESSION_COOKIE = "techlift_session";
 const SESSION_DAYS = 7;
 const MAX_BODY_BYTES = 3 * 1024 * 1024;
@@ -63,15 +65,18 @@ const validRubric = (rubric, skills) => {
     const item = rubric.find((entry) => entry && entry.skill === skill);
     if (!item) fail(400, `Score ${skill} before saving`);
     const score = Number(item.score);
-    if (!Number.isInteger(score) || score < 1 || score > 4) fail(400, "Scores must be 1 to 4");
+    if (!Number.isInteger(score) || score < 1 || score > 4)
+      fail(400, "Scores must be 1 to 4");
     return { skill, score, note: text(item.note || "", 300, "Note") };
   });
 };
 
 const validPhoto = (photo) => {
   if (!photo) return "";
-  if (typeof photo !== "string" || photo.length > MAX_PHOTO_CHARS) fail(400, "Photo is too large");
-  if (!/^data:image\/(png|jpeg|webp);base64,/i.test(photo)) fail(400, "Photo must be PNG, JPEG, or WebP");
+  if (typeof photo !== "string" || photo.length > MAX_PHOTO_CHARS)
+    fail(400, "Photo is too large");
+  if (!/^data:image\/(png|jpeg|webp);base64,/i.test(photo))
+    fail(400, "Photo must be PNG, JPEG, or WebP");
   return photo;
 };
 
@@ -84,7 +89,13 @@ const notify = (data, accountId, message, link) => {
   const list = data.notifications[accountId] || [];
   data.notifications[accountId] = [
     ...list,
-    { id: crypto.randomBytes(6).toString("hex"), message, link, createdAt: new Date().toISOString(), read: false },
+    {
+      id: crypto.randomBytes(6).toString("hex"),
+      message,
+      link,
+      createdAt: new Date().toISOString(),
+      read: false,
+    },
   ].slice(-NOTIFICATION_LIMIT);
 };
 
@@ -121,14 +132,20 @@ const createPersister = (file) => {
 
 // ---- Accounts and sessions ---------------------------------------------
 
-const hashPassword = async (password, salt = crypto.randomBytes(16).toString("hex")) => {
+const hashPassword = async (
+  password,
+  salt = crypto.randomBytes(16).toString("hex"),
+) => {
   const hash = (await scrypt(password, salt, 64)).toString("hex");
   return { salt, hash };
 };
 
 const passwordMatches = async (password, account) => {
   const { hash } = await hashPassword(password, account.salt);
-  return crypto.timingSafeEqual(Buffer.from(hash, "hex"), Buffer.from(account.passwordHash, "hex"));
+  return crypto.timingSafeEqual(
+    Buffer.from(hash, "hex"),
+    Buffer.from(account.passwordHash, "hex"),
+  );
 };
 
 const publicAccount = (account) => ({
@@ -178,9 +195,80 @@ const mentorView = (record) => {
   return rest;
 };
 
+const publicPortfolio = (data, shareId) => {
+  const entry = Object.entries(data.learnerProfiles).find(
+    ([, profile]) =>
+      profile.portfolio?.published && profile.portfolio.shareId === shareId,
+  );
+  if (!entry) return null;
+
+  const [accountId, profile] = entry;
+  const portfolio = profile.portfolio;
+  const account = data.accounts.find((item) => item.id === accountId);
+  if (!account) return null;
+
+  const reviewedProjects = Object.entries(data.submissions)
+    .filter(([key]) => key.startsWith(`techliftChallenge:${accountId}::`))
+    .flatMap(([, submission]) =>
+      [...(submission.history || []), submission]
+        .filter((round) => round.review?.status === "approved")
+        .map((round) => ({
+          id: `challenge-${submission.challengeId}-${round.round}`,
+          title: submission.challenge,
+          description: round.description,
+          problem: "",
+          contribution: "",
+          learning: "",
+          technologies: [],
+          url: round.url || "",
+          imageUrl: "",
+          source: "mentor-reviewed",
+          reviewedAt: round.review.reviewedAt,
+          mentor: round.review.reviewerName || "Mentor",
+          skills: (round.review.rubric || [])
+            .filter((item) => Number(item.score) >= 3)
+            .map((item) => ({ skill: item.skill, score: Number(item.score) })),
+        })),
+    );
+  const career = profile.careerChoice
+    ? TechLiftCareers.find(profile.careerChoice.id)
+    : null;
+  const projects = [
+    ...portfolio.projects.map((project) => ({
+      ...project,
+      source: "self-described",
+      skills: [],
+    })),
+    ...reviewedProjects,
+  ];
+
+  return {
+    name: portfolio.name || profile.fullName || account.name,
+    headline: portfolio.headline,
+    about: portfolio.about,
+    location: portfolio.location,
+    experience: portfolio.experience,
+    credentials: portfolio.credentials,
+    career: career?.title || "",
+    links: portfolio.links,
+    projects,
+    skills: reviewedProjects.flatMap((project) =>
+      project.skills.map((item) => ({
+        ...item,
+        challenge: project.title,
+        mentor: project.mentor,
+        reviewedAt: project.reviewedAt,
+      })),
+    ),
+    updatedAt: portfolio.updatedAt,
+  };
+};
+
 const buildState = (data, account) => {
   const state = {
-    techliftMentorDirectory: Object.values(data.mentorProfiles).filter(Boolean).map(publicMentor),
+    techliftMentorDirectory: Object.values(data.mentorProfiles)
+      .filter(Boolean)
+      .map(publicMentor),
   };
   if (!account) return state;
 
@@ -192,7 +280,11 @@ const buildState = (data, account) => {
 
     const approvedChallenges = new Set(
       Object.entries(data.submissions)
-        .filter(([key, record]) => key.startsWith(`techliftChallenge:${account.id}::`) && record.review?.status === "approved")
+        .filter(
+          ([key, record]) =>
+            key.startsWith(`techliftChallenge:${account.id}::`) &&
+            record.review?.status === "approved",
+        )
         .map(([, record]) => record.challengeId),
     );
 
@@ -206,7 +298,9 @@ const buildState = (data, account) => {
       }
     });
 
-    state.techliftPeerReviews = data.peerReviews.filter((review) => review.reviewerId === account.id);
+    state.techliftPeerReviews = data.peerReviews.filter(
+      (review) => review.reviewerId === account.id,
+    );
   }
 
   if (account.role === "mentor") {
@@ -214,7 +308,9 @@ const buildState = (data, account) => {
     Object.entries(data.submissions).forEach(([key, record]) => {
       if (SUBMISSION_KEY.test(key)) state[key] = mentorView(record);
     });
-    state.techliftPeerReviews = data.peerReviews.map(({ reviewerEmail, ...review }) => review);
+    state.techliftPeerReviews = data.peerReviews.map(
+      ({ reviewerEmail, ...review }) => review,
+    );
   }
 
   return state;
@@ -223,31 +319,52 @@ const buildState = (data, account) => {
 // ---- Writes ------------------------------------------------------------
 
 const KNOWN_SKILLS = new Set(
-  Object.values(TechLiftChallenges.tracks).flatMap((track) => track.challenges.flatMap((challenge) => challenge.skills)),
+  Object.values(TechLiftChallenges.tracks).flatMap((track) =>
+    track.challenges.flatMap((challenge) => challenge.skills),
+  ),
 );
 const ROUTE_HOURS = [2, 5, 10, 15];
 
 // The route builder's choices: track, hours per week, budget, known skills, finished steps.
 // The opportunity tracker holds only what the learner adds. Nothing here is fetched or invented.
-const TRACKER_STAGES = ["Interested", "Preparing", "Applied", "Interviewing", "Outcome"];
+const TRACKER_STAGES = [
+  "Interested",
+  "Preparing",
+  "Applied",
+  "Interviewing",
+  "Outcome",
+];
 const TRACKER_TYPES = [
-  "Internship", "Learnership", "Graduate programme", "Entry-level job", "Junior developer",
-  "Apprenticeship", "Scholarship", "Training programme", "Remote", "Other",
+  "Internship",
+  "Learnership",
+  "Graduate programme",
+  "Entry-level job",
+  "Junior developer",
+  "Apprenticeship",
+  "Scholarship",
+  "Training programme",
+  "Remote",
+  "Other",
 ];
 const TRACKER_LIMIT = 100;
 
 const cleanOpportunities = (list) => {
   if (!Array.isArray(list)) return [];
-  if (list.length > TRACKER_LIMIT) fail(400, "You can save up to 100 opportunities");
+  if (list.length > TRACKER_LIMIT)
+    fail(400, "You can save up to 100 opportunities");
   return list.map((item) => {
     if (!item || typeof item !== "object") fail(400, "Invalid opportunity");
     const title = text(item.title ?? "", 150, "Title");
     if (!title) fail(400, "Each opportunity needs a title");
     const link = text(item.link ?? "", 300, "Link");
-    if (link && !/^https?:\/\//i.test(link)) fail(400, "Link must start with http or https");
+    if (link && !/^https?:\/\//i.test(link))
+      fail(400, "Link must start with http or https");
     const closes = typeof item.closes === "string" ? item.closes : "";
-    if (closes && !/^\d{4}-\d{2}-\d{2}$/.test(closes)) fail(400, "Closing date must be a date");
-    const id = text(String(item.id ?? ""), 40, "Id") || crypto.randomBytes(6).toString("hex");
+    if (closes && !/^\d{4}-\d{2}-\d{2}$/.test(closes))
+      fail(400, "Closing date must be a date");
+    const id =
+      text(String(item.id ?? ""), 40, "Id") ||
+      crypto.randomBytes(6).toString("hex");
     return {
       id,
       title,
@@ -258,7 +375,10 @@ const cleanOpportunities = (list) => {
       closes,
       stage: TRACKER_STAGES.includes(item.stage) ? item.stage : "Interested",
       notes: text(item.notes ?? "", 500, "Notes"),
-      addedAt: typeof item.addedAt === "string" ? item.addedAt : new Date().toISOString(),
+      addedAt:
+        typeof item.addedAt === "string"
+          ? item.addedAt
+          : new Date().toISOString(),
       source: "user",
     };
   });
@@ -267,9 +387,162 @@ const cleanOpportunities = (list) => {
 // The career chosen in Career DNA. Only a career from the catalogue is accepted.
 const cleanCareerChoice = (raw) => {
   if (raw === null || raw === undefined || raw === "") return null;
-  if (typeof raw !== "object" || typeof raw.id !== "string") fail(400, "Invalid career choice");
+  if (typeof raw !== "object" || typeof raw.id !== "string")
+    fail(400, "Invalid career choice");
   if (!TechLiftCareers.find(raw.id)) fail(400, "Unknown career");
   return { id: raw.id, chosenAt: new Date().toISOString() };
+};
+
+const cleanWebLink = (value, label) => {
+  const link = text(value ?? "", 300, label);
+  if (link && !/^https?:\/\//i.test(link))
+    fail(400, `${label} must start with http or https`);
+  return link;
+};
+
+const cleanPortfolio = (raw, current, fullName) => {
+  if (raw === undefined || raw === null) return current || null;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    fail(400, "Invalid portfolio");
+  const sourceProjects =
+    raw.projects === undefined ? current?.projects || [] : raw.projects;
+  if (!Array.isArray(sourceProjects))
+    fail(400, "Portfolio projects must be a list");
+  if (sourceProjects.length > 12)
+    fail(400, "A portfolio can include up to 12 projects");
+
+  const projects = sourceProjects.map((project) => {
+    if (!project || typeof project !== "object")
+      fail(400, "Invalid portfolio project");
+    return {
+      id: crypto.randomBytes(8).toString("hex"),
+      title:
+        text(project.title ?? "", 120, "Project title") ||
+        fail(400, "Project title is required"),
+      description: text(project.description ?? "", 1500, "Project description"),
+      problem: text(project.problem ?? "", 500, "Project problem"),
+      contribution: text(
+        project.contribution ?? "",
+        500,
+        "Project contribution",
+      ),
+      learning: text(project.learning ?? "", 500, "Project learning"),
+      technologies: (Array.isArray(project.technologies)
+        ? project.technologies
+        : []
+      )
+        .slice(0, 12)
+        .map((item) => text(String(item), 40, "Technology"))
+        .filter(Boolean),
+      url: cleanWebLink(project.url, "Project link"),
+      imageUrl: cleanWebLink(project.imageUrl, "Project image link"),
+    };
+  });
+  const links = raw.links && typeof raw.links === "object" ? raw.links : {};
+
+  return {
+    shareId: current?.shareId || crypto.randomBytes(16).toString("hex"),
+    name: text(raw.name ?? current?.name ?? fullName, 100, "Portfolio name"),
+    headline: text(
+      raw.headline ?? current?.headline ?? "",
+      160,
+      "Portfolio headline",
+    ),
+    about: text(
+      raw.about ?? current?.about ?? "",
+      800,
+      "Portfolio introduction",
+    ),
+    location: text(raw.location ?? current?.location ?? "", 100, "Location"),
+    experience: text(
+      raw.experience ?? current?.experience ?? "",
+      1000,
+      "Relevant experience",
+    ),
+    credentials: text(
+      raw.credentials ?? current?.credentials ?? "",
+      1000,
+      "Credentials",
+    ),
+    published: raw.published === true,
+    links: {
+      github: cleanWebLink(links.github, "GitHub link"),
+      linkedin: cleanWebLink(links.linkedin, "LinkedIn link"),
+      website: cleanWebLink(links.website, "Website link"),
+    },
+    projects,
+    updatedAt: new Date().toISOString(),
+  };
+};
+
+const cleanInterviewPractice = (raw, current, opportunities) => {
+  if (raw === undefined) return current || [];
+  if (!Array.isArray(raw)) fail(400, "Interview practice must be a list");
+  if (raw.length > 50) fail(400, "Keep up to 50 interview practice sessions");
+
+  const ids = new Set();
+  return raw.map((item) => {
+    if (!item || typeof item !== "object")
+      fail(400, "Invalid interview session");
+    const previous = (current || []).find((session) => session.id === item.id);
+    const id = String(item.id ?? "");
+    if (!/^[a-f0-9-]{36}$/i.test(id) || ids.has(id))
+      fail(400, "Interview session IDs must be unique");
+    ids.add(id);
+
+    const career = item.careerId ? TechLiftCareers.find(item.careerId) : null;
+    if (item.careerId && !career) fail(400, "Unknown interview career");
+    const category = ["behavioral", "technical", "scenario"].includes(
+      item.category,
+    )
+      ? item.category
+      : fail(400, "Unknown interview question type");
+    const questionId = text(item.questionId ?? "", 60, "Question ID");
+    if (!/^[a-z0-9-]+$/.test(questionId))
+      fail(400, "Invalid interview question ID");
+    const question = text(item.question ?? "", 300, "Interview question");
+    if (!question) fail(400, "Interview question is required");
+
+    const answers = {};
+    ["situation", "task", "action", "result"].forEach((part) => {
+      answers[part] = text(item.answers?.[part] ?? "", 1800, `${part} answer`);
+      if (!answers[part])
+        fail(400, `Complete the ${part} part of your STAR answer`);
+    });
+
+    const scores = {};
+    ["clarity", "relevance", "structure", "evidence"].forEach((dimension) => {
+      const score = Number(item.scores?.[dimension]);
+      if (!Number.isInteger(score) || score < 1 || score > 4)
+        fail(400, "Self-review scores must be from 1 to 4");
+      scores[dimension] = score;
+    });
+
+    const opportunityId = text(item.opportunityId ?? "", 100, "Opportunity ID");
+    const linkedOpportunity = opportunities.find(
+      (opportunity) => opportunity.id === opportunityId,
+    );
+    if (
+      opportunityId &&
+      !linkedOpportunity &&
+      previous?.opportunityId !== opportunityId
+    )
+      fail(400, "Choose an opportunity from your tracker");
+
+    return {
+      id,
+      careerId: career?.id || "",
+      questionId,
+      question,
+      category,
+      opportunityId,
+      opportunityTitle: linkedOpportunity?.title || previous?.opportunityTitle || "",
+      answers,
+      scores,
+      reflection: text(item.reflection ?? "", 600, "Practice reflection"),
+      savedAt: new Date().toISOString(),
+    };
+  });
 };
 
 const cleanRoute = (raw, fallbackTrack) => {
@@ -279,8 +552,13 @@ const cleanRoute = (raw, fallbackTrack) => {
     track,
     hours: ROUTE_HOURS.includes(Number(raw.hours)) ? Number(raw.hours) : 5,
     budget: raw.budget === "some" ? "some" : "free",
-    knownSkills: (Array.isArray(raw.knownSkills) ? raw.knownSkills : []).filter((skill) => KNOWN_SKILLS.has(skill)),
-    completedSteps: (Array.isArray(raw.completedSteps) ? raw.completedSteps : []).filter((id) => {
+    knownSkills: (Array.isArray(raw.knownSkills) ? raw.knownSkills : []).filter(
+      (skill) => KNOWN_SKILLS.has(skill),
+    ),
+    completedSteps: (Array.isArray(raw.completedSteps)
+      ? raw.completedSteps
+      : []
+    ).filter((id) => {
       const challenge = TechLiftChallenges.find(id);
       return challenge && challenge.track === track;
     }),
@@ -289,30 +567,64 @@ const cleanRoute = (raw, fallbackTrack) => {
 
 const saveLearnerProfile = (data, account, value) => {
   const current = data.learnerProfiles[account.id] || {};
-  const path = value.path === undefined ? current.path || "frontend" : value.path;
+  const path =
+    value.path === undefined ? current.path || "frontend" : value.path;
   if (!TRACKS.includes(path)) fail(400, "Unknown track");
 
   const mentorId = value.mentorId ? String(value.mentorId) : null;
   if (mentorId && !data.mentorProfiles[mentorId]) fail(400, "Unknown mentor");
 
-  const requestedChallenge = value.challengeId ? TechLiftChallenges.find(value.challengeId) : null;
+  const requestedChallenge = value.challengeId
+    ? TechLiftChallenges.find(value.challengeId)
+    : null;
   const challengeId =
     requestedChallenge && requestedChallenge.track === path
       ? requestedChallenge.id
-      : current.challengeId && TechLiftChallenges.find(current.challengeId)?.track === path
+      : current.challengeId &&
+          TechLiftChallenges.find(current.challengeId)?.track === path
         ? current.challengeId
         : TechLiftChallenges.core(path).id;
+  const opportunities = cleanOpportunities(
+    value.opportunities === undefined
+      ? current.opportunities
+      : value.opportunities,
+  );
 
   data.learnerProfiles[account.id] = {
-    fullName: text(value.fullName ?? current.fullName ?? account.name, 100, "Name"),
+    fullName: text(
+      value.fullName ?? current.fullName ?? account.name,
+      100,
+      "Name",
+    ),
     path,
     goal: text(value.goal ?? current.goal ?? "", 200, "Goal"),
-    availability: text(value.availability ?? current.availability ?? "", 200, "Availability"),
+    availability: text(
+      value.availability ?? current.availability ?? "",
+      200,
+      "Availability",
+    ),
     challengeId,
     mentorId,
-    route: cleanRoute(value.route === undefined ? current.route : value.route, path),
-    opportunities: cleanOpportunities(value.opportunities === undefined ? current.opportunities : value.opportunities),
-    careerChoice: cleanCareerChoice(value.careerChoice === undefined ? current.careerChoice : value.careerChoice),
+    route: cleanRoute(
+      value.route === undefined ? current.route : value.route,
+      path,
+    ),
+    opportunities,
+    careerChoice: cleanCareerChoice(
+      value.careerChoice === undefined
+        ? current.careerChoice
+        : value.careerChoice,
+    ),
+    interviewPractice: cleanInterviewPractice(
+      value.interviewPractice,
+      current.interviewPractice,
+      opportunities,
+    ),
+    portfolio: cleanPortfolio(
+      value.portfolio,
+      current.portfolio,
+      text(value.fullName ?? current.fullName ?? account.name, 100, "Name"),
+    ),
   };
 };
 
@@ -335,23 +647,37 @@ const saveMentorProfile = (data, account, value) => {
   };
 };
 
-const SUBMISSION_KINDS = ["github", "deployed", "screenshot", "link", "written"];
+const SUBMISSION_KINDS = [
+  "github",
+  "deployed",
+  "screenshot",
+  "link",
+  "written",
+];
 
 const saveLearnerSubmission = (data, account, key, challengeId, value) => {
   const challenge = TechLiftChallenges.find(challengeId);
   const profile = data.learnerProfiles[account.id] || {};
   if (!challenge) fail(400, "Unknown challenge");
-  if (challenge.track !== profile.path) fail(403, "This challenge is not in your track");
+  if (challenge.track !== profile.path)
+    fail(403, "This challenge is not in your track");
 
   const description = text(value.description ?? "", 5000, "Description");
   if (!description) fail(400, "Describe what you built");
   const url = text(value.url ?? "", 300, "Link");
-  if (url && !/^https?:\/\//i.test(url)) fail(400, "Link must start with http or https");
+  if (url && !/^https?:\/\//i.test(url))
+    fail(400, "Link must start with http or https");
 
   // What kind of evidence this is. A GitHub submission must point at github.com.
-  const kind = SUBMISSION_KINDS.includes(value.kind) ? value.kind : url ? "link" : "written";
-  if (kind === "github" && !/^https:\/\/github\.com\//i.test(url)) fail(400, "A GitHub submission needs a github.com link");
-  if ((kind === "deployed" || kind === "screenshot") && !url) fail(400, "Add a link to the deployed project or screenshot");
+  const kind = SUBMISSION_KINDS.includes(value.kind)
+    ? value.kind
+    : url
+      ? "link"
+      : "written";
+  if (kind === "github" && !/^https:\/\/github\.com\//i.test(url))
+    fail(400, "A GitHub submission needs a github.com link");
+  if ((kind === "deployed" || kind === "screenshot") && !url)
+    fail(400, "Add a link to the deployed project or screenshot");
 
   const existing = data.submissions[key];
   const base = {
@@ -367,9 +693,16 @@ const saveLearnerSubmission = (data, account, key, challengeId, value) => {
   };
 
   // Not reviewed yet: update the same round.
-  if (!existing) return { ...base, round: 1, history: [], review: null, changeNote: "" };
+  if (!existing)
+    return { ...base, round: 1, history: [], review: null, changeNote: "" };
   if (!existing.review) {
-    return { ...base, round: existing.round, history: existing.history, review: null, changeNote: existing.changeNote || "" };
+    return {
+      ...base,
+      round: existing.round,
+      history: existing.history,
+      review: null,
+      changeNote: existing.changeNote || "",
+    };
   }
 
   // Reviewed: archive the reviewed round and start the next one.
@@ -383,7 +716,13 @@ const saveLearnerSubmission = (data, account, key, challengeId, value) => {
     changeNote: existing.changeNote || "",
     review: existing.review,
   };
-  return { ...base, round: existing.round + 1, history: [...existing.history, snapshot], review: null, changeNote };
+  return {
+    ...base,
+    round: existing.round + 1,
+    history: [...existing.history, snapshot],
+    review: null,
+    changeNote,
+  };
 };
 
 const saveReview = (data, mentorAccount, key, value) => {
@@ -391,12 +730,15 @@ const saveReview = (data, mentorAccount, key, value) => {
   if (!existing) fail(404, "Submission not found");
   const challenge = TechLiftChallenges.find(existing.challengeId);
   const review = value.review || {};
-  if (!["pending", "approved", "changes"].includes(review.status)) fail(400, "Unknown review status");
+  if (!["pending", "approved", "changes"].includes(review.status))
+    fail(400, "Unknown review status");
 
   const mentorProfile = data.mentorProfiles[mentorAccount.id];
   existing.review = {
     status: review.status,
-    feedback: text(review.feedback ?? "", 3000, "Feedback") || fail(400, "Feedback is required"),
+    feedback:
+      text(review.feedback ?? "", 3000, "Feedback") ||
+      fail(400, "Feedback is required"),
     rubric: validRubric(review.rubric, challenge.skills),
     reviewerId: mentorAccount.id,
     reviewerName: mentorProfile?.name || mentorAccount.name,
@@ -404,28 +746,41 @@ const saveReview = (data, mentorAccount, key, value) => {
   };
   data.submissions[key] = existing;
   const learnerId = SUBMISSION_KEY.exec(key)[1];
-  const verdict = { approved: "approved", changes: "asked for changes", pending: "reopened" }[existing.review.status];
-  notify(data, learnerId, `${existing.review.reviewerName} ${verdict} your work: ${existing.challenge}`, "dashboard.html");
+  const verdict = {
+    approved: "approved",
+    changes: "asked for changes",
+    pending: "reopened",
+  }[existing.review.status];
+  notify(
+    data,
+    learnerId,
+    `${existing.review.reviewerName} ${verdict} your work: ${existing.challenge}`,
+    "dashboard.html",
+  );
 };
 
 // Peer reviews are append-only for learners. Mentors may only add a spot-check.
 const savePeerReviews = (data, account, list) => {
   if (!Array.isArray(list)) fail(400, "Peer reviews must be a list");
-  const existingById = new Map(data.peerReviews.map((review) => [review.id, review]));
+  const existingById = new Map(
+    data.peerReviews.map((review) => [review.id, review]),
+  );
   const incomingIds = new Set(list.map((review) => review && review.id));
   if ([...existingById.keys()].some((id) => !incomingIds.has(id))) {
     fail(403, "Peer reviews cannot be removed");
   }
 
   const next = list.map((item) => {
-    if (!item || typeof item.id !== "string") fail(400, "Each peer review needs an id");
+    if (!item || typeof item.id !== "string")
+      fail(400, "Each peer review needs an id");
     const existing = existingById.get(item.id);
 
     if (existing) {
       if (account.role === "mentor") {
         const check = item.spotCheck;
         if (!check) return existing;
-        if (!["agree", "disagree"].includes(check.verdict)) fail(400, "Verdict must be agree or disagree");
+        if (!["agree", "disagree"].includes(check.verdict))
+          fail(400, "Verdict must be agree or disagree");
         return {
           ...existing,
           spotCheck: {
@@ -436,16 +791,19 @@ const savePeerReviews = (data, account, list) => {
           },
         };
       }
-      if (JSON.stringify(item) !== JSON.stringify(existing)) fail(403, "Learners cannot change a peer review");
+      if (JSON.stringify(item) !== JSON.stringify(existing))
+        fail(403, "Learners cannot change a peer review");
       return existing;
     }
 
-    if (account.role !== "learner") fail(403, "Only learners write peer reviews");
+    if (account.role !== "learner")
+      fail(403, "Only learners write peer reviews");
     const match = SUBMISSION_KEY.exec(item.submissionKey || "");
     const peerSubmission = match && data.submissions[item.submissionKey];
     if (!peerSubmission) fail(400, "Unknown submission");
     if (match[1] === account.id) fail(403, "You cannot review your own work");
-    if (peerSubmission.challengeId !== item.challengeId) fail(400, "Challenge does not match the submission");
+    if (peerSubmission.challengeId !== item.challengeId)
+      fail(400, "Challenge does not match the submission");
 
     const ownKey = `techliftChallenge:${account.id}::${item.challengeId}`;
     if (data.submissions[ownKey]?.review?.status !== "approved") {
@@ -472,33 +830,62 @@ const savePeerReviews = (data, account, list) => {
     const before = existingById.get(review.id);
     if (!before) {
       const ownerId = SUBMISSION_KEY.exec(review.submissionKey)[1];
-      notify(data, ownerId, `${review.reviewerName} left peer feedback on your work`, "dashboard.html");
-    } else if (review.spotCheck && JSON.stringify(review.spotCheck) !== JSON.stringify(before.spotCheck)) {
-      notify(data, review.reviewerId, "A mentor spot-checked your peer review", "dashboard.html");
+      notify(
+        data,
+        ownerId,
+        `${review.reviewerName} left peer feedback on your work`,
+        "dashboard.html",
+      );
+    } else if (
+      review.spotCheck &&
+      JSON.stringify(review.spotCheck) !== JSON.stringify(before.spotCheck)
+    ) {
+      notify(
+        data,
+        review.reviewerId,
+        "A mentor spot-checked your peer review",
+        "dashboard.html",
+      );
     }
   });
 };
 
 const routeKvWrite = (data, account, key, value) => {
   if (key === "techliftUser") {
-    if (account.role !== "learner") fail(403, "Only learners have a learner profile");
+    if (account.role !== "learner")
+      fail(403, "Only learners have a learner profile");
     return saveLearnerProfile(data, account, value);
   }
   if (key === "techliftMentorProfile") {
-    if (account.role !== "mentor") fail(403, "Only mentors have a mentor profile");
+    if (account.role !== "mentor")
+      fail(403, "Only mentors have a mentor profile");
     return saveMentorProfile(data, account, value);
   }
   if (key === "techliftMentorDirectory") return; // derived from mentor profiles
-  if (key === "techliftPeerReviews") return savePeerReviews(data, account, value);
+  if (key === "techliftPeerReviews")
+    return savePeerReviews(data, account, value);
 
   const match = SUBMISSION_KEY.exec(key);
   if (!match) fail(400, "Unknown record");
   if (account.role === "learner" && match[1] === account.id) {
-    data.submissions[key] = saveLearnerSubmission(data, account, key, match[2], value);
+    data.submissions[key] = saveLearnerSubmission(
+      data,
+      account,
+      key,
+      match[2],
+      value,
+    );
     const challenge = TechLiftChallenges.find(match[2]);
     data.accounts
       .filter((item) => item.role === "mentor")
-      .forEach((mentor) => notify(data, mentor.id, `${account.name} sent work for review: ${challenge.title}`, "mentor-dashboard.html"));
+      .forEach((mentor) =>
+        notify(
+          data,
+          mentor.id,
+          `${account.name} sent work for review: ${challenge.title}`,
+          "mentor-dashboard.html",
+        ),
+      );
     return;
   }
   if (account.role === "mentor") return saveReview(data, account, key, value);
@@ -535,12 +922,16 @@ const readJson = (request) =>
   });
 
 const sendJson = (response, status, body, headers = {}) => {
-  response.writeHead(status, { "Content-Type": "application/json; charset=utf-8", ...headers });
+  response.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    ...headers,
+  });
   response.end(JSON.stringify(body));
 };
 
 const serveStatic = (request, response, pathname) => {
-  const relative = pathname === "/" ? "index.html" : decodeURIComponent(pathname.slice(1));
+  const relative =
+    pathname === "/" ? "index.html" : decodeURIComponent(pathname.slice(1));
   const normalised = path.posix.normalize(relative);
   const blocked =
     normalised.startsWith("..") ||
@@ -558,7 +949,9 @@ const serveStatic = (request, response, pathname) => {
       response.writeHead(404).end("Not found");
       return;
     }
-    const type = CONTENT_TYPES[path.extname(filePath).toLowerCase()] || "application/octet-stream";
+    const type =
+      CONTENT_TYPES[path.extname(filePath).toLowerCase()] ||
+      "application/octet-stream";
     response.writeHead(200, { "Content-Type": type });
     response.end(request.method === "HEAD" ? undefined : contents);
   });
@@ -577,12 +970,17 @@ const createServer = ({ file = DATA_FILE } = {}) => {
       sessions.delete(token);
       return null;
     }
-    return data.accounts.find((account) => account.id === session.accountId) || null;
+    return (
+      data.accounts.find((account) => account.id === session.accountId) || null
+    );
   };
 
   const startSession = (response, account) => {
     const token = crypto.randomBytes(32).toString("hex");
-    sessions.set(token, { accountId: account.id, expires: Date.now() + SESSION_DAYS * 864e5 });
+    sessions.set(token, {
+      accountId: account.id,
+      expires: Date.now() + SESSION_DAYS * 864e5,
+    });
     response.setHeader(
       "Set-Cookie",
       `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_DAYS * 86400}`,
@@ -592,7 +990,10 @@ const createServer = ({ file = DATA_FILE } = {}) => {
   const endSession = (request, response) => {
     const token = cookieValue(request, SESSION_COOKIE);
     if (token) sessions.delete(token);
-    response.setHeader("Set-Cookie", `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`);
+    response.setHeader(
+      "Set-Cookie",
+      `${SESSION_COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`,
+    );
   };
 
   const requireAccount = (request) => {
@@ -607,8 +1008,10 @@ const createServer = ({ file = DATA_FILE } = {}) => {
     const password = typeof body?.password === "string" ? body.password : "";
     if (!name) fail(400, "Name is required");
     if (!EMAIL.test(email)) fail(400, "Enter a valid email address");
-    if (password.length < 8) fail(400, "Password must be at least 8 characters");
-    if (data.accounts.some((account) => account.email === email)) fail(409, "An account with this email already exists");
+    if (password.length < 8)
+      fail(400, "Password must be at least 8 characters");
+    if (data.accounts.some((account) => account.email === email))
+      fail(409, "An account with this email already exists");
 
     const { salt, hash } = await hashPassword(password);
     const account = {
@@ -652,9 +1055,12 @@ const createServer = ({ file = DATA_FILE } = {}) => {
 
       if (pathname === "/api/auth/login" && request.method === "POST") {
         const body = await readJson(request);
-        const email = String(body?.email ?? "").trim().toLowerCase();
+        const email = String(body?.email ?? "")
+          .trim()
+          .toLowerCase();
         const account = data.accounts.find((item) => item.email === email);
-        const password = typeof body?.password === "string" ? body.password : "";
+        const password =
+          typeof body?.password === "string" ? body.password : "";
         if (!account || !(await passwordMatches(password, account))) {
           fail(401, "Email or password is incorrect");
         }
@@ -669,18 +1075,38 @@ const createServer = ({ file = DATA_FILE } = {}) => {
 
       if (pathname === "/api/notifications" && request.method === "GET") {
         const account = currentAccount(request);
-        return sendJson(response, 200, account ? data.notifications[account.id] || [] : []);
+        return sendJson(
+          response,
+          200,
+          account ? data.notifications[account.id] || [] : [],
+        );
       }
 
       if (pathname === "/api/notifications/read" && request.method === "POST") {
         const account = requireAccount(request);
-        (data.notifications[account.id] || []).forEach((item) => (item.read = true));
+        (data.notifications[account.id] || []).forEach(
+          (item) => (item.read = true),
+        );
         await persist(data);
         return sendJson(response, 200, { ok: true });
       }
 
       if (pathname === "/api/state" && request.method === "GET") {
-        return sendJson(response, 200, buildState(data, currentAccount(request)));
+        return sendJson(
+          response,
+          200,
+          buildState(data, currentAccount(request)),
+        );
+      }
+
+      if (pathname.startsWith("/api/portfolio/") && request.method === "GET") {
+        const shareId = pathname.slice("/api/portfolio/".length);
+        if (!/^[a-f0-9]{32}$/.test(shareId)) fail(404, "Portfolio not found");
+        const portfolio = publicPortfolio(data, shareId);
+        if (!portfolio) fail(404, "Portfolio not found");
+        return sendJson(response, 200, portfolio, {
+          "Cache-Control": "no-store",
+        });
       }
 
       if (pathname.startsWith("/api/kv/") && request.method === "PUT") {
@@ -706,7 +1132,8 @@ const createServer = ({ file = DATA_FILE } = {}) => {
     } catch (error) {
       const status = error.status || 500;
       if (status === 500) console.error(error);
-      const message = status === 500 ? "Something went wrong on the server" : error.message;
+      const message =
+        status === 500 ? "Something went wrong on the server" : error.message;
       if (!response.headersSent) sendJson(response, status, { error: message });
       else response.end();
     }

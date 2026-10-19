@@ -13,6 +13,8 @@ TechLift is a front-end prototype for a guided tech-learning experience. It help
 - Notifications: learners hear about reviews and peer feedback, mentors hear about new submissions, and the panel updates every 30 seconds
 - Recommended next challenge, chosen from the learner's lowest-rated skill
 - Skills passport with verified skills, evidence links, and print or save-as-PDF
+- Proof Wall portfolio with editable project stories, optional public sharing, and separate labels for self-described work and mentor-reviewed evidence
+- Interview Gym with role-specific questions, STAR answer practice, private self-review history, and saved-opportunity context
 - Peer review circles, unlocked after a learner's own work is approved; mentors spot-check peer reviews
 - Mentor matching by expertise, with badges for turnaround, feedback depth, and calibration
 - Mentor calibration: compares mentors who score the same challenge and flags outliers
@@ -46,6 +48,8 @@ Google Fonts are loaded from a CDN, so an internet connection is needed for the 
 - `dashboard.html` — learner dashboard and weekly challenge
 - `mentor-dashboard.html` — mentor profile editor, rubric review queue, calibration, and peer spot-checks
 - `passport.html` — learner skills passport
+- `portfolio.html` — private portfolio editor and optional public Proof Wall link
+- `interview.html` — learner-private interview practice and saved sessions
 - `career-dna.html` — Career DNA: six questions match your interests, working style, existing skills, time, and budget to career profiles. Each match explains why it came up. Careers without TechLift challenges are labelled as such
 - `bridge.html` — My roadmap (The Bridge): your chosen career on the existing career map. A milestone is complete when its skills are verified and its challenges are approved
 - `route.html` — route builder: track, known skills, weekly hours, and budget give an ordered challenge route, time estimate, skill gaps, and resources; signed-in learners save progress
@@ -59,6 +63,7 @@ Google Fonts are loaded from a CDN, so an internet connection is needed for the 
 - Learning resources, job sites, and course providers are listed as starting points. Their content, prices, and links have not been checked live.
 - The decoder reads keywords, so it can miss skills described in other words.
 - The comparison shows no course prices or job-outcome figures, because TechLift holds no verified data for them.
+- Interview Gym uses curated prompts and private self-review; it does not provide AI scoring, audio recording, or hiring predictions.
 
 This project is a front-end demonstration, not a production learning platform.
 
@@ -71,7 +76,7 @@ This project is a front-end demonstration, not a production learning platform.
 - Mentor qualifications are displayed as entered and are not independently verified.
 - Peer reviews and mentor calibration now see everyone's records on the same server, but there is still only one mentor per login, and nothing stops a person from reviewing their own work across accounts.
 - Submissions saved before challenge levels were added still load as the core challenge for their track.
-- The skills passport is only viewable on the server running it. A public, shareable link needs hosting and accounts first.
+- The Skill Passport is account-private; the opt-in Proof Wall shares selected profile fields, learner-authored projects, and approved challenge evidence through a random share token.
 
 Do not use real passwords or sensitive personal information with this prototype. A production version would need a backend, account authentication, access controls, shared data storage, and a process for verifying mentor credentials.
 
@@ -84,11 +89,11 @@ Do not use real passwords or sensitive personal information with this prototype.
 
 ## Roadmap
 
-- Add real learner and mentor accounts with role-based access
-- Store learner profiles, submissions, and mentor reviews in a shared backend
+- Test the complete learner-to-mentor experience in browser automation
+- Replace remaining sample dashboard figures with real learning progress
 - Verify mentor credentials
-- Replace sample dashboard data with real learning progress
-- Test the complete experience with learners and mentors
+- Add email verification, password reset, and durable session storage before production use
+- Add verified live opportunity sources before presenting listings as current vacancies
 
 ## License
 

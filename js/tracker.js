@@ -7,7 +7,13 @@ TechLiftStore.ready.then(() => {
   const signedIn = document.getElementById("trackerSignedIn");
   if (!signedOut || !signedIn) return;
 
-  const stages = ["Interested", "Preparing", "Applied", "Interviewing", "Outcome"];
+  const stages = [
+    "Interested",
+    "Preparing",
+    "Applied",
+    "Interviewing",
+    "Outcome",
+  ];
   const form = document.getElementById("trackerForm");
   const list = document.getElementById("trackerList");
   const empty = document.getElementById("trackerEmpty");
@@ -18,7 +24,9 @@ TechLiftStore.ready.then(() => {
   signedOut.classList.toggle("hidden", Boolean(isLearner));
   signedIn.classList.toggle("hidden", !isLearner);
   if (!isLearner) {
-    if (account) signedOut.querySelector("p").textContent = "The tracker is for learner accounts.";
+    if (account)
+      signedOut.querySelector("p").textContent =
+        "The tracker is for learner accounts.";
     return;
   }
 
@@ -27,12 +35,18 @@ TechLiftStore.ready.then(() => {
   const save = (next) => TechLiftStore.saveUser({ opportunities: next });
 
   const formatDate = (value) =>
-    new Date(`${value}T00:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    new Date(`${value}T00:00:00`).toLocaleDateString(undefined, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
   const closedLabel = (closes) => {
     if (!closes) return "No closing date given";
     const today = new Date().toISOString().slice(0, 10);
-    return closes < today ? `Closed ${formatDate(closes)}` : `Closes ${formatDate(closes)}`;
+    return closes < today
+      ? `Closed ${formatDate(closes)}`
+      : `Closes ${formatDate(closes)}`;
   };
 
   const render = () => {
@@ -44,11 +58,14 @@ TechLiftStore.ready.then(() => {
       counts[item.stage] = (counts[item.stage] || 0) + 1;
     });
     summary.textContent = all.length
-      ? stages.map((stage) => `${counts[stage]} ${stage.toLowerCase()}`).join(" · ")
+      ? stages
+          .map((stage) => `${counts[stage]} ${stage.toLowerCase()}`)
+          .join(" · ")
       : "";
 
     list.innerHTML = all
-      .map((item) => `
+      .map(
+        (item) => `
         <li class="tracker-item">
           <div class="tracker-item-head">
             <div>
@@ -64,8 +81,10 @@ TechLiftStore.ready.then(() => {
             </label>
           </div>
           ${item.notes ? `<p class="tracker-notes">${escapeHtml(item.notes)}</p>` : ""}
+          <a class="text-link" href="interview.html?opportunity=${escapeHtml(encodeURIComponent(item.id))}">Prepare for interview</a>
           <button class="text-link button-link" type="button" data-id="${escapeHtml(item.id)}" data-action="remove">Remove from tracker</button>
-        </li>`)
+        </li>`,
+      )
       .join("");
   };
 
@@ -106,7 +125,9 @@ TechLiftStore.ready.then(() => {
   list.addEventListener("change", async (event) => {
     if (event.target.dataset.action !== "stage") return;
     const next = items().map((item) =>
-      item.id === event.target.dataset.id ? { ...item, stage: event.target.value } : item,
+      item.id === event.target.dataset.id
+        ? { ...item, stage: event.target.value }
+        : item,
     );
     await save(next);
     render();
@@ -116,7 +137,12 @@ TechLiftStore.ready.then(() => {
     const button = event.target.closest("[data-action='remove']");
     if (!button) return;
     const item = items().find((entry) => entry.id === button.dataset.id);
-    if (!window.confirm(`Remove “${item?.title || "this role"}” from your tracker? This does not affect the employer’s advert.`)) return;
+    if (
+      !window.confirm(
+        `Remove “${item?.title || "this role"}” from your tracker? This does not affect the employer’s advert.`,
+      )
+    )
+      return;
     await save(items().filter((entry) => entry.id !== button.dataset.id));
     render();
   });
