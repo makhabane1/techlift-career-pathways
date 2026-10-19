@@ -871,10 +871,15 @@ test("interview practice validates private STAR sessions and links them to saved
       session.answers.result,
     );
 
-    const removeOpportunity = await request(app, "PUT", "/api/kv/techliftUser", {
-      body: { opportunities: [], interviewPractice: [session] },
-      cookie: ana.cookie,
-    });
+    const removeOpportunity = await request(
+      app,
+      "PUT",
+      "/api/kv/techliftUser",
+      {
+        body: { opportunities: [], interviewPractice: [session] },
+        cookie: ana.cookie,
+      },
+    );
     assert.equal(removeOpportunity.status, 204);
     const retained = (
       await request(app, "GET", "/api/state", { cookie: ana.cookie })
@@ -901,6 +906,69 @@ test("interview practice validates private STAR sessions and links them to saved
         .techliftUser.interviewPractice,
       [],
     );
+  } finally {
+    await app.close();
+  }
+});
+
+test("planner settings and task progress are validated and saved per learner", async () => {
+  const app = await start();
+  try {
+    const ana = await signupLearner(app, "ana@example.com");
+    const nomsa = await signupMentor(app, "nomsa@example.com", "Nomsa Dube");
+    const planner = {
+      track: "frontend",
+      hoursPerWeek: 5,
+      availableDays: ["mon", "thu"],
+      energy: "steady",
+      confidence: 3,
+      priority: "portfolio",
+      tasks: [
+        {
+          id: "task-frontend-core",
+          title: "Build the responsive hero",
+          day: "thu",
+          challengeId: "frontend-core",
+          completed: true,
+        },
+      ],
+    };
+
+    const invalidHours = await request(app, "PUT", "/api/kv/techliftUser", {
+      body: { planner: { ...planner, hoursPerWeek: 3 } },
+      cookie: ana.cookie,
+    });
+    assert.equal(invalidHours.status, 400);
+
+    const invalidTask = await request(app, "PUT", "/api/kv/techliftUser", {
+      body: {
+        planner: {
+          ...planner,
+          tasks: [{ ...planner.tasks[0], challengeId: "unknown-task" }],
+        },
+      },
+      cookie: ana.cookie,
+    });
+    assert.equal(invalidTask.status, 400);
+
+    const saved = await request(app, "PUT", "/api/kv/techliftUser", {
+      body: { planner },
+      cookie: ana.cookie,
+    });
+    assert.equal(saved.status, 204);
+    const state = (
+      await request(app, "GET", "/api/state", { cookie: ana.cookie })
+    ).json.techliftUser;
+    assert.equal(state.planner.hoursPerWeek, 5);
+    assert.equal(state.planner.availableDays[1], "thu");
+    assert.equal(state.planner.tasks[0].completed, true);
+    assert.equal(state.planner.tasks[0].challengeId, "frontend-core");
+
+    const mentorWrite = await request(app, "PUT", "/api/kv/techliftUser", {
+      body: { planner },
+      cookie: nomsa.cookie,
+    });
+    assert.equal(mentorWrite.status, 403);
   } finally {
     await app.close();
   }

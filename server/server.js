@@ -536,7 +536,8 @@ const cleanInterviewPractice = (raw, current, opportunities) => {
       question,
       category,
       opportunityId,
-      opportunityTitle: linkedOpportunity?.title || previous?.opportunityTitle || "",
+      opportunityTitle:
+        linkedOpportunity?.title || previous?.opportunityTitle || "",
       answers,
       scores,
       reflection: text(item.reflection ?? "", 600, "Practice reflection"),
@@ -562,6 +563,74 @@ const cleanRoute = (raw, fallbackTrack) => {
       const challenge = TechLiftChallenges.find(id);
       return challenge && challenge.track === track;
     }),
+  };
+};
+
+const cleanPlanner = (raw, current, fallbackTrack) => {
+  if (raw === undefined || raw === null) return current || null;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    fail(400, "Invalid learning plan");
+
+  const hoursPerWeek = Number(raw.hoursPerWeek);
+  if (![2, 5, 10, 15, 20].includes(hoursPerWeek))
+    fail(400, "Choose a supported weekly study time");
+  const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const availableDays = [
+    ...new Set(Array.isArray(raw.availableDays) ? raw.availableDays : []),
+  ];
+  if (availableDays.some((day) => !days.includes(day)))
+    fail(400, "Choose valid study days");
+  if (!availableDays.length) fail(400, "Choose at least one study day");
+
+  const energies = ["low", "steady", "high"];
+  if (!energies.includes(raw.energy))
+    fail(400, "Choose your current energy level");
+  const confidence = Number(raw.confidence);
+  if (!Number.isInteger(confidence) || confidence < 1 || confidence > 5)
+    fail(400, "Confidence must be from 1 to 5");
+  const priorities = ["learn", "practice", "portfolio", "applications", "rest"];
+  if (!priorities.includes(raw.priority)) fail(400, "Choose a weekly priority");
+
+  const sourceTasks =
+    raw.tasks === undefined ? current?.tasks || [] : raw.tasks;
+  if (!Array.isArray(sourceTasks)) fail(400, "Weekly tasks must be a list");
+  if (sourceTasks.length > 20) fail(400, "Keep up to 20 tasks in one plan");
+  const ids = new Set();
+  const tasks = sourceTasks.map((task) => {
+    if (!task || typeof task !== "object") fail(400, "Invalid learning task");
+    const id = text(String(task.id ?? ""), 100, "Task ID");
+    if (!/^[a-z0-9-]+$/i.test(id) || ids.has(id))
+      fail(400, "Task IDs must be unique");
+    ids.add(id);
+    const title = text(task.title ?? "", 140, "Task title");
+    if (!title) fail(400, "Each task needs a title");
+    const day = days.includes(task.day) ? task.day : availableDays[0];
+    const challengeId = text(task.challengeId ?? "", 60, "Challenge ID");
+    if (challengeId && !TechLiftChallenges.find(challengeId))
+      fail(400, "Unknown challenge for learning task");
+    return {
+      id,
+      title,
+      day: availableDays.includes(day) ? day : availableDays[0],
+      challengeId,
+      completed: task.completed === true,
+    };
+  });
+
+  return {
+    track: TRACKS.includes(raw.track) ? raw.track : fallbackTrack,
+    hoursPerWeek,
+    availableDays,
+    energy: raw.energy,
+    confidence,
+    priority: raw.priority,
+    reflection: text(
+      raw.reflection ?? current?.reflection ?? "",
+      700,
+      "Weekly reflection",
+    ),
+    tasks,
+    updatedAt: new Date().toISOString(),
   };
 };
 
@@ -609,6 +678,7 @@ const saveLearnerProfile = (data, account, value) => {
       value.route === undefined ? current.route : value.route,
       path,
     ),
+    planner: cleanPlanner(value.planner, current.planner, path),
     opportunities,
     careerChoice: cleanCareerChoice(
       value.careerChoice === undefined
