@@ -687,3 +687,28 @@
   outline: 3px solid var(--primary-soft);
   outline-offset: 3px;
 }
+
+/* Passport: legend and self-declared skills, kept apart from verified skills. */
+.passport-legend {
+  margin: 0 0 1.25rem;
+  max-width: 70ch;
+}
+
+.passport-declared {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--line);
+}
+
+.passport-declared h3 {
+  margin: 0 0 0.35rem;
+}
+
+.passport-declared-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

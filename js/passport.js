@@ -67,7 +67,21 @@ TechLiftStore.ready.then(() => {
          <a class="btn btn-secondary" href="dashboard.html">Go to dashboard</a>
        </div>`;
 
-  card.innerHTML = `${header}${body}`;
+  // Skills the learner marked as already known on the route. TechLift has not
+  // checked these, so they are shown separately from mentor-verified skills.
+  const verifiedNames = new Set(skills.map((group) => group.skill));
+  const selfDeclared = (user.route?.knownSkills || []).filter((skill) => !verifiedNames.has(skill));
+  const declaredBlock = selfDeclared.length
+    ? `<section class="passport-declared" aria-labelledby="declaredHeading">
+         <h3 id="declaredHeading">Self-declared skills</h3>
+         <p class="muted">You marked these as skills you already have. TechLift has not checked them, so they are not verified.</p>
+         <ul class="passport-declared-list">${selfDeclared.map((skill) => `<li><span class="skill-chip">${escapeHtml(skill)}</span></li>`).join("")}</ul>
+       </section>`
+    : "";
+
+  const legend = `<p class="passport-legend muted"><strong>Verified</strong> means a TechLift mentor scored this skill 3 or higher on an approved challenge. It is an internal review. It is not an official industry certificate or qualification.</p>`;
+
+  card.innerHTML = `${header}${legend}${body}${declaredBlock}`;
 
   document.getElementById("printPassport").addEventListener("click", () => window.print());
 });
