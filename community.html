@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechLift | Build With Me</title>
+    <meta
+      name="description"
+      content="Find project partners, join career study groups, and ask peers for feedback on your work."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="assets/techlift-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/community.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="index.html" aria-label="TechLift home">
+          <img
+            class="brand-logo"
+            src="assets/techlift-logo.svg"
+            alt="TechLift logo"
+          />
+          <span>TechLift</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="bridge.html">My roadmap</a>
+          <a href="lab.html">Challenge Lab</a>
+          <a href="opportunities.html">Opportunities</a>
+          <a href="community.html" aria-current="page">Build With Me</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="text-link" href="dashboard.html" data-account-link
+            >Sign in</a
+          >
+        </div>
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          aria-pressed="false"
+          title="Switch to dark mode"
+        >
+          <span aria-hidden="true">☾</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="community-page">
+      <section class="community-hero">
+        <div class="container">
+          <p class="eyebrow">Build With Me</p>
+          <h1>Find people to build with.</h1>
+          <p class="community-lede">
+            Join a study group for your track, look for a project partner, or
+            ask a peer to look at your work. Only signed-in learners and mentors
+            can see these posts, and you choose what you share.
+          </p>
+        </div>
+      </section>
+
+      <section class="container community-gate" id="communityGate" hidden>
+        <h2>Log in to join the community</h2>
+        <p>
+          Posts are shared only with other TechLift members, so you need an
+          account to read or post.
+        </p>
+        <a class="btn btn-primary" href="login.html">Log in or sign up</a>
+      </section>
+
+      <div class="container community-workspace" id="communityWorkspace" hidden>
+        <p
+          class="community-message"
+          id="communityMessage"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <section class="community-section" aria-labelledby="groupsHeading">
+          <div class="community-section-head">
+            <h2 id="groupsHeading">Study groups</h2>
+            <p>Learn alongside people on the same track.</p>
+          </div>
+          <form class="community-form" id="groupForm" novalidate>
+            <h3>Start a study group</h3>
+            <label>
+              Group name
+              <input name="title" maxlength="120" required />
+            </label>
+            <label>
+              Track
+              <select name="track" required data-track-select></select>
+            </label>
+            <label>
+              What the group does
+              <textarea name="summary" rows="3" maxlength="600"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Create group</button>
+          </form>
+          <div class="community-list" id="groupList"></div>
+        </section>
+
+        <section class="community-section" aria-labelledby="listingsHeading">
+          <div class="community-section-head">
+            <h2 id="listingsHeading">Project partners</h2>
+            <p>Find someone to build a project with, or offer your skills.</p>
+          </div>
+          <form class="community-form" id="listingForm" novalidate>
+            <h3>Post a partner listing</h3>
+            <label>
+              Headline
+              <input name="title" maxlength="120" required />
+            </label>
+            <label>
+              Track
+              <select name="track" required data-track-select></select>
+            </label>
+            <label>
+              Skills you bring or need
+              <input name="skills" maxlength="200" />
+            </label>
+            <label>
+              When you are free
+              <input name="availability" maxlength="200" />
+            </label>
+            <label>
+              About the project
+              <textarea name="summary" rows="3" maxlength="600"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Post listing</button>
+          </form>
+          <div class="community-list" id="listingList"></div>
+        </section>
+
+        <section class="community-section" aria-labelledby="requestsHeading">
+          <div class="community-section-head">
+            <h2 id="requestsHeading">Feedback requests</h2>
+            <p>
+              Ask peers to look at a project. Peer feedback is not a mentor
+              review, and it is not scored.
+            </p>
+          </div>
+          <form class="community-form" id="requestForm" novalidate>
+            <h3>Ask for feedback</h3>
+            <label>
+              What you want feedback on
+              <input name="title" maxlength="120" required />
+            </label>
+            <label>
+              Track
+              <select name="track" required data-track-select></select>
+            </label>
+            <label>
+              Link to the work (optional, starts with https://)
+              <input name="link" type="url" maxlength="300" />
+            </label>
+            <label>
+              What kind of feedback would help
+              <textarea name="summary" rows="3" maxlength="600"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Ask for feedback</button>
+          </form>
+          <div class="community-list" id="requestList"></div>
+        </section>
+
+        <section class="community-section" aria-labelledby="blockedHeading">
+          <h2 id="blockedHeading">Blocked accounts</h2>
+          <p>Posts from blocked accounts are hidden from you, and yours from them.</p>
+          <ul class="community-blocked" id="blockedList"></ul>
+        </section>
+
+        <section
+          class="community-section community-moderation"
+          id="moderationSection"
+          aria-labelledby="moderationHeading"
+          hidden
+        >
+          <div class="community-section-head">
+            <h2 id="moderationHeading">Moderation queue</h2>
+            <p>
+              Posts reported by members. Three different reporters hide a post
+              from everyone until it is reviewed here. Only moderators see this.
+            </p>
+          </div>
+          <div class="community-list" id="moderationList"></div>
+        </section>
+
+        <section class="community-section community-note">
+          <h2>Mentor sessions</h2>
+          <p>
+            Mentor office hours are not scheduled through TechLift yet. Mentor
+            feedback on your work happens in the Challenge Lab.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <script src="js/challenge-library.js"></script>
+    <script src="js/careers-data.js"></script>
+    <script src="js/techlift-store.js"></script>
+    <script src="js/community.js"></script>
+    <script src="js/theme.js"></script>
+  </body>
+</html>
