@@ -3,9 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const root = document.documentElement;
   const storageKey = "techliftTheme";
   const savedTheme = localStorage.getItem(storageKey);
-  const systemPrefersDark = window.matchMedia(
-    "(prefers-color-scheme: dark)",
-  ).matches;
 
   const applyTheme = (theme) => {
     const isDark = theme === "dark";
@@ -19,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.querySelector("span").textContent = isDark ? "☼" : "☾";
   };
 
-  applyTheme(savedTheme || (systemPrefersDark ? "dark" : "light"));
+  // Light is the default; a saved choice from the toggle always wins.
+  applyTheme(savedTheme || "light");
 
   toggle.addEventListener("click", () => {
     const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";

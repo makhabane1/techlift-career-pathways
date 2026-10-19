@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TechLift | Build a future in tech</title>
+    <link rel="icon" href="assets/techlift-logo.svg" type="image/svg+xml" />
     <meta
       name="description"
       content="TechLift helps learners build confident, job-ready tech careers through guided pathways and real-world projects."
@@ -20,6 +21,7 @@
     <link rel="stylesheet" href="css/career-map.css" />
     <link rel="stylesheet" href="css/sections.css" />
     <link rel="stylesheet" href="css/mentor-profile.css" />
+    <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/theme.css" />
   </head>
   <body>
@@ -85,169 +87,92 @@
     </header>
 
     <main id="top">
-      <section class="hero section">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">Career pathways, built for momentum</p>
-            <h1>Build the career you want, one step at a time.</h1>
-            <p class="lede">
-              Learn in-demand skills, move through guided pathways, and turn
-              progress into real job opportunities with a supportive tech
-              learning experience.
+      <section class="home-hero">
+        <div class="container home-hero-grid">
+          <div>
+            <p class="eyebrow">Tech careers, built from what you can do</p>
+            <h1>Find your route into tech, then prove it.</h1>
+            <p class="home-lede">
+              TechLift helps you choose a direction, plan the learning around
+              your week, complete practical challenges, and collect reviewed
+              evidence for the roles you want.
             </p>
-
             <div class="cta-row">
-              <a
-                class="btn btn-primary"
-                href="programs.html"
-                >Explore programs</a
-              >
-              <a
-                class="btn btn-secondary"
-                href="route.html"
-                >See the roadmap</a
-              >
-            </div>
-
-            <div class="trust-row" aria-label="Trust indicators">
-              <div>
-                <strong>4</strong><span>career tracks</span>
-              </div>
-              <div>
-                <strong>12</strong><span>practical challenges</span>
-              </div>
-              <div>
-                <strong>33</strong><span>skills, each scored against a written rubric</span>
-              </div>
+              <a class="btn btn-primary" href="career-dna.html">Find my direction</a>
+              <a class="btn btn-secondary" href="bridge.html">Open my roadmap</a>
             </div>
           </div>
-
-          <div class="hero-visual" aria-label="Tech learning dashboard preview">
-            <div class="orbit-card">
-              <div class="orbit-header">
-                <span class="pill pill-accent">Career Map</span>
-                <span class="mini-stat">Frontend Track</span>
-              </div>
-
-              <div class="orbit-graph" aria-hidden="true">
-                <span class="node node-1 done">HTML</span>
-                <span class="node node-2 done">CSS</span>
-                <span class="node node-3 active">JS</span>
-                <span class="node node-4">React</span>
-                <span class="node node-5">Portfolio</span>
-              </div>
-
-              <div class="orbit-footer">
-                <div>
-                  <small>Example milestone</small>
-                  <strong>JavaScript Foundations</strong>
-                </div>
-                <div class="progress-ring">
-                  <span>68%</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ol class="home-start" aria-label="Where to start">
+            <li>
+              <a href="career-dna.html">
+                <span class="home-step">01</span>
+                <span><strong>Career DNA</strong>Answer a short questionnaire about your interests, time and budget.</span>
+              </a>
+            </li>
+            <li>
+              <a href="lab.html">
+                <span class="home-step">02</span>
+                <span><strong>Challenge Lab</strong>Build a real project, submit the link, and get a mentor's score against a written rubric.</span>
+              </a>
+            </li>
+            <li>
+              <a href="opportunities.html">
+                <span class="home-step">03</span>
+                <span><strong>Opportunity Hub</strong>Save internships, learnerships and entry-level roles, and track each application.</span>
+              </a>
+            </li>
+          </ol>
         </div>
       </section>
 
-      <section class="section stats-band">
-        <div class="container stats-grid">
-          <article class="stat-card">
-            <span class="stat-label">Career tracks</span>
-            <strong>4</strong>
-            <small>frontend, product design, data, and product</small>
-          </article>
-          <article class="stat-card">
-            <span class="stat-label">Feedback</span>
-            <strong>Mentor</strong>
-            <small>each submission is scored by a person against the rubric</small>
-          </article>
-          <article class="stat-card">
-            <span class="stat-label">Challenges</span>
-            <strong>12</strong>
-            <small>three levels in each track</small>
-          </article>
-          <article class="stat-card">
-            <span class="stat-label">Time per challenge</span>
-            <strong>2–8 hrs</strong>
-            <small>estimated in each challenge brief</small>
-          </article>
+      <section id="programs" class="home-section">
+        <div class="container home-split">
+          <div>
+            <p class="eyebrow">Career routes</p>
+            <h2>Four ways in, each with its own roadmap.</h2>
+            <p class="home-note">
+              Requirements differ between employers. Each route shows what is
+              usually expected at entry level, and what a mentor would check
+              before you apply.
+            </p>
+          </div>
+          <ul class="home-routes">
+            <li>
+              <a href="route.html">
+                <span class="home-route-name">Frontend development</span>
+                <span>HTML, CSS, JavaScript and a portfolio of working interfaces.</span>
+              </a>
+            </li>
+            <li>
+              <a href="route.html">
+                <span class="home-route-name">Product and UX design</span>
+                <span>Research, wireframes, prototypes and design decisions you can defend.</span>
+              </a>
+            </li>
+            <li>
+              <a href="route.html">
+                <span class="home-route-name">Data analytics</span>
+                <span>Clean data, build dashboards, and explain what the numbers mean.</span>
+              </a>
+            </li>
+            <li>
+              <a href="programs.html">
+                <span class="home-route-name">Cybersecurity, testing and more</span>
+                <span>Browse every track and its challenges.</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </section>
 
-      <section id="programs" class="section">
+      <section id="career-map" class="home-section home-section-alt">
         <div class="container">
-          <div class="section-header short">
-            <p class="eyebrow">Program pathways</p>
-            <h2>Choose your path to a tech career.</h2>
-          </div>
-
-          <div class="course-grid">
-            <article class="course-card card-highlight">
-              <span class="chip chip-primary">Most popular</span>
-              <h3>Frontend Development</h3>
-              <p>
-                Learn HTML, CSS, JavaScript, React, and design thinking to build
-                polished digital experiences.
-              </p>
-              <ul>
-                <li>Responsive UI design</li>
-                <li>JavaScript fundamentals</li>
-                <li>Portfolio projects</li>
-              </ul>
-              <a href="route.html" class="text-link">View roadmap</a
-              >
-            </article>
-
-            <article class="course-card">
-              <span class="chip">Product</span>
-              <h3>Product & UX</h3>
-              <p>
-                Build workflows, improve user journeys, and turn research into
-                experiences customers love.
-              </p>
-              <ul>
-                <li>Wireframes and prototyping</li>
-                <li>User research</li>
-                <li>Design systems</li>
-              </ul>
-              <a href="programs.html" class="text-link">Explore course</a
-              >
-            </article>
-
-            <article class="course-card">
-              <span class="chip">Data</span>
-              <h3>Data & Analytics</h3>
-              <p>
-                Work with dashboards, metrics, and analysis to make informed
-                decisions backed by evidence.
-              </p>
-              <ul>
-                <li>SQL and spreadsheets</li>
-                <li>Insights and storytelling</li>
-                <li>Business dashboards</li>
-              </ul>
-              <a href="route.html" class="text-link">See path</a
-              >
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="career-map" class="section section-alt">
-        <div class="container">
-          <div class="section-header short">
+          <div class="home-heading">
             <p class="eyebrow">Career map</p>
-            <h2>Follow the path from beginner to job-ready.</h2>
+            <h2>From beginner to job-ready, one milestone at a time.</h2>
           </div>
-
           <div class="career-map-layout">
-            <div
-              id="careerMap"
-              class="career-map"
-              aria-label="Career map"
-            ></div>
+            <div id="careerMap" class="career-map" aria-label="Career map"></div>
             <aside class="map-panel">
               <p class="eyebrow mini">Selected role</p>
               <h3 id="mapTitle">Frontend Engineer</h3>
@@ -255,13 +180,11 @@
                 Design responsive interfaces, write clean front-end logic, and
                 ship launch-ready features.
               </p>
-
               <div class="map-key">
                 <div><span class="dot dot-done"></span> Completed</div>
                 <div><span class="dot dot-current"></span> Current</div>
                 <div><span class="dot dot-upcoming"></span> Upcoming</div>
               </div>
-
               <ul id="mapMilestones" class="milestone-list">
                 <li>HTML foundations</li>
                 <li>CSS layout systems</li>
@@ -272,40 +195,35 @@
         </div>
       </section>
 
-      <section id="how-it-works" class="section">
-        <div class="container">
-          <div class="section-header short">
+      <section id="how-it-works" class="home-section">
+        <div class="container home-split">
+          <div>
             <p class="eyebrow">How it works</p>
             <h2>From a first challenge to reviewed work.</h2>
           </div>
-
-          <ol class="story-grid">
-            <li class="story-card">
-              <div class="avatar">1</div>
-              <p>Choose a track and mark the skills you already have. The route builder shows the challenges to take and how long they take at your pace.</p>
+          <ol class="home-steps">
+            <li>
               <strong>Plan your route</strong>
+              <p>Choose a track, mark the skills you already have, and see the challenges to take at your pace.</p>
             </li>
-            <li class="story-card">
-              <div class="avatar alt">2</div>
-              <p>Build the challenge and submit it with a link. A mentor scores each skill from 1 to 4 against written descriptions.</p>
+            <li>
               <strong>Build and submit</strong>
+              <p>Build the challenge and submit it with a link. A mentor scores each skill from 1 to 4 against written descriptions.</p>
             </li>
-            <li class="story-card">
-              <div class="avatar">3</div>
-              <p>Skills scored 3 or higher are verified and added to your passport. Once your work is approved, you review a peer's work too.</p>
+            <li>
               <strong>Prove it</strong>
+              <p>Skills scored 3 or higher are verified and added to your passport. After your work is approved, you review a peer's work too.</p>
             </li>
           </ol>
         </div>
       </section>
 
-      <section id="instructors" class="section section-alt">
+      <section id="instructors" class="home-section home-section-alt">
         <div class="container">
-          <div class="section-header short">
+          <div class="home-heading">
             <p class="eyebrow">Mentors</p>
             <h2>Mentors who review your work.</h2>
           </div>
-
           <div
             id="publishedMentorDirectory"
             class="mentor-grid published-mentor-directory"
@@ -314,14 +232,10 @@
         </div>
       </section>
 
-      <section class="section cta-band">
-        <div class="container cta-box">
-          <div>
-            <p class="eyebrow">Your next move starts here</p>
-            <h2>Make your next chapter your strongest one.</h2>
-          </div>
-          <a class="btn btn-primary" href="signup.html">Start learning</a
-          >
+      <section class="home-cta">
+        <div class="container home-cta-inner">
+          <h2>Start with one question: which kind of work do you enjoy?</h2>
+          <a class="btn btn-primary" href="career-dna.html">Start with Career DNA</a>
         </div>
       </section>
     </main>
