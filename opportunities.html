@@ -25,7 +25,11 @@
     <header class="site-header">
       <div class="container nav-shell">
         <a class="brand" href="index.html" aria-label="TechLift home">
-          <img class="brand-logo" src="assets/techlift-logo.svg" alt="TechLift logo" />
+          <img
+            class="brand-logo"
+            src="assets/techlift-logo.svg"
+            alt="TechLift logo"
+          />
           <span>TechLift</span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
@@ -34,11 +38,20 @@
           <a href="compare.html">Compare careers</a>
           <a href="decode.html">Decode a job</a>
           <a href="opportunities.html" aria-current="page">Opportunities</a>
+          <a href="planner.html">Learning Planner</a>
         </nav>
         <div class="nav-actions">
-          <a class="text-link" href="dashboard.html" data-account-link>Sign in</a>
+          <a class="text-link" href="dashboard.html" data-account-link
+            >Sign in</a
+          >
         </div>
-        <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          aria-pressed="false"
+          title="Switch to dark mode"
+        >
           <span aria-hidden="true">☾</span>
         </button>
       </div>
@@ -50,15 +63,25 @@
           <p class="eyebrow">Opportunity hub</p>
           <h1>Where to look for your first role.</h1>
           <p class="lede">
-            A directory of job boards, government support, remote work, and certificates. TechLift does not hold live listings, so every link takes you to the source to search for current roles.
+            A directory of job boards, government support, remote work, and
+            certificates. TechLift does not hold live listings, so every link
+            takes you to the source to search for current roles.
           </p>
-          <p class="notice-line" role="note">Check that each site still works and that the roles are open before you apply.</p>
+          <p class="notice-line" role="note">
+            Check that each site still works and that the roles are open before
+            you apply.
+          </p>
         </div>
       </section>
 
       <section class="section">
         <div class="container">
-          <div class="filter-row" role="group" aria-label="Filter by type" id="typeFilters"></div>
+          <div
+            class="filter-row"
+            role="group"
+            aria-label="Filter by type"
+            id="typeFilters"
+          ></div>
           <ul class="source-grid" id="sourceList"></ul>
         </div>
       </section>
@@ -70,16 +93,27 @@
               <div>
                 <p class="eyebrow">My tracker</p>
                 <h2>Opportunities you are following</h2>
-                <p class="muted">Add roles you found yourself, with the link to the original advert. Nothing here is imported or verified by TechLift.</p>
+                <p class="muted">
+                  Add roles you found yourself, with the link to the original
+                  advert. Nothing here is imported or verified by TechLift.
+                </p>
               </div>
-              <p class="tracker-summary" id="trackerSummary" aria-live="polite"></p>
+              <p
+                class="tracker-summary"
+                id="trackerSummary"
+                aria-live="polite"
+              ></p>
             </div>
 
             <div id="trackerSignedOut" class="hidden">
-              <p class="muted">Sign in to save opportunities and track your applications.</p>
+              <p class="muted">
+                Sign in to save opportunities and track your applications.
+              </p>
               <div class="cta-row">
                 <a class="btn btn-primary" href="login.html">Sign in</a>
-                <a class="btn btn-secondary" href="signup.html">Create an account</a>
+                <a class="btn btn-secondary" href="signup.html"
+                  >Create an account</a
+                >
               </div>
             </div>
 
@@ -87,11 +121,22 @@
               <form id="trackerForm" class="tracker-form" novalidate>
                 <label>
                   <span class="field-label">Title</span>
-                  <input name="title" type="text" required maxlength="150" placeholder="e.g. Junior frontend developer" />
+                  <input
+                    name="title"
+                    type="text"
+                    required
+                    maxlength="150"
+                    placeholder="e.g. Junior frontend developer"
+                  />
                 </label>
                 <label>
                   <span class="field-label">Organisation</span>
-                  <input name="organisation" type="text" maxlength="150" placeholder="Company or programme" />
+                  <input
+                    name="organisation"
+                    type="text"
+                    maxlength="150"
+                    placeholder="Company or programme"
+                  />
                 </label>
                 <label>
                   <span class="field-label">Type</span>
@@ -110,11 +155,21 @@
                 </label>
                 <label>
                   <span class="field-label">Location</span>
-                  <input name="location" type="text" maxlength="100" placeholder="City, or Remote" />
+                  <input
+                    name="location"
+                    type="text"
+                    maxlength="100"
+                    placeholder="City, or Remote"
+                  />
                 </label>
                 <label>
                   <span class="field-label">Link to the original advert</span>
-                  <input name="link" type="url" maxlength="300" placeholder="https://" />
+                  <input
+                    name="link"
+                    type="url"
+                    maxlength="300"
+                    placeholder="https://"
+                  />
                 </label>
                 <label>
                   <span class="field-label">Closing date</span>
@@ -122,14 +177,23 @@
                 </label>
                 <label class="tracker-wide">
                   <span class="field-label">Notes</span>
-                  <textarea name="notes" rows="2" maxlength="500" placeholder="What the role asks for, what to send, who to contact"></textarea>
+                  <textarea
+                    name="notes"
+                    rows="2"
+                    maxlength="500"
+                    placeholder="What the role asks for, what to send, who to contact"
+                  ></textarea>
                 </label>
-                <button class="btn btn-primary" type="submit">Add to my tracker</button>
+                <button class="btn btn-primary" type="submit">
+                  Add to my tracker
+                </button>
                 <p id="trackerError" class="form-error" role="alert"></p>
               </form>
 
               <ul class="tracker-list" id="trackerList"></ul>
-              <p class="muted" id="trackerEmpty">Nothing saved yet. Add a role above when you find one.</p>
+              <p class="muted" id="trackerEmpty">
+                Nothing saved yet. Add a role above when you find one.
+              </p>
             </div>
           </div>
         </div>
@@ -145,7 +209,9 @@
 
     <footer class="site-footer">
       <div class="container footer-shell">
-        <a class="brand footer-brand" href="index.html"><span>TechLift</span></a>
+        <a class="brand footer-brand" href="index.html"
+          ><span>TechLift</span></a
+        >
         <nav class="footer-links" aria-label="Footer navigation">
           <a href="programs.html">Programs</a>
           <a href="opportunities.html" aria-current="page">Opportunities</a>
